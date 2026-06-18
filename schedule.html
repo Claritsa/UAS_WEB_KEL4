@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jadwal Tayang — VelvetScreen</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C9A84C;--gold-light:#E8C97A;--black:#0A0A0A;--deep:#111014;--panel:#16141A;--border:rgba(201,168,76,0.2);--muted:rgba(255,255,255,0.45);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--black);color:#fff;font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden;}
+::-webkit-scrollbar{width:3px;} ::-webkit-scrollbar-thumb{background:var(--gold);}
+
+#navbar{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.2rem 0;background:rgba(10,10,10,0.95);backdrop-filter:blur(14px);border-bottom:0.5px solid var(--border);}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:.15em;color:var(--gold)!important;text-decoration:none;}
+.nav-logo span{color:#fff;}
+.nav-link-item{color:rgba(255,255,255,0.65);font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;padding:.4rem .9rem;transition:color .2s;display:inline-block;}
+.nav-link-item:hover,.nav-link-item.active{color:var(--gold);}
+.btn-ticket{background:transparent;border:0.5px solid var(--gold);color:var(--gold);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;padding:.45rem 1.2rem;border-radius:0;transition:all .25s;text-decoration:none;}
+.btn-ticket:hover{background:var(--gold);color:var(--black);}
+
+/* PAGE HEADER */
+.page-header{padding:9rem 0 3.5rem;background:linear-gradient(to bottom,rgba(10,10,10,.5),var(--black)),url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1600&q=80') center/cover;}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,6.5rem);letter-spacing:.06em;line-height:.88;}
+
+/* SUB NAV */
+.sub-nav{background:var(--deep);border-bottom:.5px solid var(--border);padding:0;position:sticky;top:65px;z-index:99;}
+.sub-nav a{display:inline-block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:1rem 1.4rem;text-decoration:none;border-bottom:2px solid transparent;transition:all .25s;}
+.sub-nav a:hover{color:var(--gold);}
+.sub-nav a.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* DAY PILLS */
+.day-tab{background:var(--panel);border:.5px solid var(--border);color:var(--muted);font-size:.7rem;letter-spacing:.06em;padding:.6rem 1rem;border-radius:0;cursor:pointer;transition:all .25s;text-align:center;min-width:70px;font-family:'DM Sans',sans-serif;}
+.day-tab:hover{border-color:var(--gold);color:var(--gold);}
+.day-tab.active{background:var(--gold);border-color:var(--gold);color:var(--black);font-weight:500;}
+.day-tab .day-name{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;display:block;}
+.day-tab .day-num{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.06em;line-height:1;}
+
+/* STUDIO FILTER */
+.studio-pill{background:transparent;border:.5px solid var(--border);color:var(--muted);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:.4rem .9rem;border-radius:0;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.studio-pill:hover,.studio-pill.active{border-color:var(--gold);color:var(--gold);}
+
+/* SCHEDULE TABLE */
+.schedule-block{margin-bottom:2.5rem;}
+.film-row{background:var(--panel);border:.5px solid var(--border);padding:1rem 1.2rem;display:flex;align-items:center;gap:1.2rem;margin-bottom:.5rem;transition:all .25s;cursor:pointer;text-decoration:none;color:#fff;}
+.film-row:hover{border-color:var(--gold);background:#1A1820;color:#fff;}
+.film-row-poster{width:40px;height:60px;object-fit:cover;flex-shrink:0;filter:brightness(.8);}
+.film-row-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:.15rem;}
+.film-row-meta{font-size:.68rem;color:var(--muted);}
+.film-row-times{display:flex;flex-wrap:wrap;gap:.5rem;margin-left:auto;}
+.time-chip{background:var(--deep);border:.5px solid var(--border);color:rgba(255,255,255,.7);font-size:.7rem;padding:.3rem .7rem;transition:all .2s;text-decoration:none;display:inline-block;}
+.time-chip:hover{background:var(--gold);border-color:var(--gold);color:var(--black);}
+.time-chip.soldout{opacity:.3;cursor:not-allowed;pointer-events:none;}
+
+/* STUDIO LABEL */
+.studio-section-label{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;display:flex;align-items:center;gap:.7rem;}
+.studio-section-label::after{content:'';flex:1;height:.5px;background:var(--border);}
+
+/* LEGEND */
+.legend-dot{width:10px;height:10px;border-radius:50%;}
+
+/* SPINNER */
+.spinner{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:3rem auto;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+footer{background:var(--deep);border-top:.5px solid var(--border);padding:2.5rem 0;}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.15em;color:var(--gold);}
+.footer-link{font-size:.78rem;color:rgba(255,255,255,.45);text-decoration:none;margin-bottom:.4rem;display:block;transition:color .2s;}
+.footer-link:hover{color:var(--gold-light);}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <a href="index.html" class="nav-logo">VELVET<span>SCREEN</span></a>
+      <div class="d-none d-lg-flex align-items-center">
+        <a href="index.html" class="nav-link-item">Beranda</a>
+        <a href="now-showing.html" class="nav-link-item">Sedang Tayang</a>
+        <a href="coming-soon.html" class="nav-link-item">Segera Hadir</a>
+        <a href="schedule.html" class="nav-link-item active">Jadwal</a>
+        <a href="location.html" class="nav-link-item">Lokasi</a>
+      </div>
+      <a href="booking.html" class="btn-ticket">Beli Tiket</a>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="container">
+    <p style="font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;display:flex;align-items:center;gap:.7rem;"><span style="width:28px;height:.5px;background:var(--gold);display:inline-block;"></span>Program Bioskop</p>
+    <h1 class="page-title">JADWAL<br><span style="color:var(--gold)">TAYANG</span></h1>
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--muted);font-size:1.05rem;margin-top:.8rem;">Pilih tanggal dan studio untuk melihat jadwal lengkap</p>
+  </div>
+</div>
+
+<!-- SUB NAV -->
+<div class="sub-nav">
+  <div class="container">
+    <a href="now-showing.html">Sedang Tayang</a>
+    <a href="coming-soon.html">Segera Hadir</a>
+    <a href="schedule.html" class="active">Jadwal Lengkap</a>
+    <a href="movies.html">Semua Film</a>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div style="padding:2.5rem 0 5rem;background:var(--black);">
+  <div class="container">
+
+    <!-- DAY SELECTOR -->
+    <div class="mb-4">
+      <p style="font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:.8rem;"><i class="fa fa-calendar me-2" style="color:var(--gold)"></i>Pilih Tanggal</p>
+      <div class="d-flex gap-2 flex-wrap" id="dayTabs"></div>
+    </div>
+
+    <!-- STUDIO FILTER -->
+    <div class="mb-4">
+      <p style="font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:.8rem;"><i class="fa fa-tv me-2" style="color:var(--gold)"></i>Filter Studio</p>
+      <div class="d-flex gap-2 flex-wrap">
+        <button class="studio-pill active" data-studio="semua">Semua Studio</button>
+        <button class="studio-pill" data-studio="IMAX">IMAX Dome</button>
+        <button class="studio-pill" data-studio="Gold Class">Gold Class</button>
+        <button class="studio-pill" data-studio="4DX">4DX Motion</button>
+        <button class="studio-pill" data-studio="Reguler">Reguler</button>
+      </div>
+    </div>
+
+    <!-- LEGEND -->
+    <div class="d-flex align-items-center gap-4 mb-4 flex-wrap" style="font-size:.68rem;color:var(--muted);">
+      <div class="d-flex align-items-center gap-2"><div class="legend-dot" style="background:var(--gold)"></div> Tersedia</div>
+      <div class="d-flex align-items-center gap-2"><div class="legend-dot" style="background:#444;"></div> Hampir Penuh</div>
+      <div class="d-flex align-items-center gap-2"><div class="legend-dot" style="background:#3D1010;"></div> Habis</div>
+    </div>
+
+    <!-- SCHEDULE CONTENT -->
+    <div id="loader"><div class="spinner"></div></div>
+    <div id="scheduleContent"></div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4"><div class="footer-logo mb-1">VELVETSCREEN</div><p style="font-size:.78rem;color:var(--muted);">Pengalaman bioskop terdepan di Indonesia.</p></div>
+      <div class="col-6 col-md-3">
+        <div style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;">Navigasi</div>
+        <a href="now-showing.html" class="footer-link">Sedang Tayang</a>
+        <a href="coming-soon.html" class="footer-link">Segera Hadir</a>
+        <a href="schedule.html" class="footer-link">Jadwal</a>
+        <a href="booking.html" class="footer-link">Pesan Tiket</a>
+        <a href="location.html" class="footer-link">Lokasi</a>
+      </div>
+    </div>
+    <div style="border-top:.5px solid rgba(255,255,255,.06);padding-top:1.5rem;margin-top:2rem;">
+      <div style="font-size:.7rem;color:var(--muted);">© 2026 VelvetScreen. Hak cipta dilindungi.</div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const DAYS_ID = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const MONTHS_ID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+let allMovies = [];
+let selectedDayIdx = 0;
+let selectedStudio = 'semua';
+
+/* Build next 7 days */
+function buildDayTabs() {
+  const container = document.getElementById('dayTabs');
+  const today = new Date();
+  container.innerHTML = Array.from({length:7}, (_,i) => {
+    const d = new Date(today); d.setDate(today.getDate() + i);
+    const label = i === 0 ? 'Hari Ini' : i === 1 ? 'Besok' : DAYS_ID[d.getDay()];
+    return `
+      <button class="day-tab ${i===0?'active':''}" data-idx="${i}" onclick="selectDay(${i})">
+        <span class="day-name">${label}</span>
+        <span class="day-num">${d.getDate()}</span>
+        <span class="day-name">${MONTHS_ID[d.getMonth()]}</span>
+      </button>`;
+  }).join('');
+}
+
+function selectDay(idx) {
+  selectedDayIdx = idx;
+  document.querySelectorAll('.day-tab').forEach(b => b.classList.toggle('active', parseInt(b.dataset.idx)===idx));
+  renderSchedule();
+}
+
+document.querySelectorAll('.studio-pill').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.studio-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedStudio = btn.dataset.studio;
+    renderSchedule();
+  };
+});
+
+/* Render schedule table */
+function renderSchedule() {
+  const content = document.getElementById('scheduleContent');
+  const movies = allMovies.filter(m => m.status === 'now_showing');
+
+  /* studios to show */
+  const allStudios = ['IMAX','Gold Class','4DX','Reguler'];
+  const studios = selectedStudio === 'semua' ? allStudios : [selectedStudio];
+
+  /* Day offset changes showtime variety slightly */
+  const dayOffset = selectedDayIdx;
+
+  content.innerHTML = studios.map(studio => {
+    /* filter movies that have this studio */
+    const studioMovies = movies.filter(m => m.studios.includes(studio));
+    if (!studioMovies.length) return '';
+
+    const rows = studioMovies.map(m => {
+      /* Vary times slightly by day for realism */
+      const times = m.showtimes.filter((_,i) => (i + dayOffset) % 2 === 0 || m.showtimes.length <= 3);
+      const today = new Date();
+      const showDate = new Date(today);
+      showDate.setDate(today.getDate() + selectedDayIdx);
+      showDate.setHours(0,0,0,0);
+
+      const timesHtml = times.map((t,i) => {
+        const soldout = (i + dayOffset * 3) % 7 === 0;
+        const [hour, minute] = t.split(':').map(Number);
+        const showDateTime = new Date(showDate);
+        showDateTime.setHours(hour, minute, 0, 0);
+        const isPast = showDateTime <= new Date();
+        const unavailable = soldout || (selectedDayIdx === 0 && isPast);
+        const url = `booking.html?id=${m.id}&time=${t}&studio=${encodeURIComponent(studio)}`;
+        return unavailable
+          ? `<span class="time-chip soldout" title="Jadwal lewat atau tidak tersedia">${t}</span>`
+          : `<a href="${url}" class="time-chip">${t}</a>`;
+      }).join('');
+
+      return `
+        <div class="film-row" onclick="location.href='booking.html?id=${m.id}'">
+          <img src="${m.poster}" class="film-row-poster" alt="${m.title}">
+          <div>
+            <div class="film-row-title">${m.title}</div>
+            <div class="film-row-meta">${m.genre} · ${m.duration} · ${m.age}</div>
+            <div style="font-size:.65rem;color:var(--gold);margin-top:.15rem;">Mulai Rp ${m.price.toLocaleString('id-ID')}</div>
+          </div>
+          <div class="film-row-times">${timesHtml}</div>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="schedule-block reveal">
+        <div class="studio-section-label"><i class="fa fa-tv me-2"></i>${studio}</div>
+        ${rows}
+      </div>`;
+  }).join('') || '<p style="color:var(--muted);font-size:.85rem;padding:2rem 0;">Tidak ada jadwal untuk filter ini.</p>';
+
+  setTimeout(() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible')), 50);
+}
+
+async function init() {
+  buildDayTabs();
+  const res = await fetch('movies.json');
+  allMovies = await res.json();
+  document.getElementById('loader').style.display = 'none';
+  renderSchedule();
+}
+
+init();
+setInterval(renderSchedule, 60000);
+</script>
+</body>
+</html>

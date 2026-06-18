@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akun Saya — VelvetScreen</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C9A84C;--black:#0A0A0A;--deep:#111014;--panel:#16141A;--border:rgba(201,168,76,0.2);--muted:rgba(255,255,255,0.45);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--black);color:#fff;font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+::-webkit-scrollbar{width:3px;} ::-webkit-scrollbar-thumb{background:var(--gold);}
+nav{background:rgba(10,10,10,.95);border-bottom:0.5px solid var(--border);}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.65rem;letter-spacing:.15em;color:var(--gold);text-decoration:none;}
+.container{padding:2rem 1rem;}
+.card-panel{background:var(--panel);border:0.5px solid var(--border);padding:1.8rem;border-radius:0;margin-bottom:1.5rem;}
+.title{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.08em;margin-bottom:.7rem;}
+.user-badge{display:inline-flex;gap:.6rem;align-items:center;padding:.45rem .75rem;border:1px solid var(--border);color:var(--muted);font-size:.82rem;}
+.order-card{background:#111116;border:0.5px solid var(--border);padding:1.4rem;margin-bottom:1rem;}
+.order-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold);margin-bottom:.6rem;}
+.order-meta{font-size:.8rem;color:var(--muted);line-height:1.8;}
+.order-seats{display:flex;flex-wrap:wrap;gap:.4rem;margin:0.8rem 0;}
+.seat-chip{background:rgba(201,168,76,.15);border:.5px solid var(--gold);color:var(--gold);font-size:.75rem;padding:.25rem .65rem;}
+.btn-ghost{background:transparent;border:.5px solid var(--border);color:#fff;padding:.75rem 1.2rem;border-radius:0;}
+.btn-danger{background:#cc4444;border:none;color:#fff;padding:.75rem 1.2rem;border-radius:0;}
+.btn-gold{background:var(--gold);border:none;color:#111;padding:.75rem 1.2rem;border-radius:0;font-weight:600;}
+.btn-gold:hover{background:#e8c97a;color:#111;}
+.status-pill{display:inline-flex;padding:.3rem .7rem;font-size:.75rem;border-radius:0;color:#fff;}
+.status-active{background:#2a2a30;color:var(--gold);}
+.status-cancel{background:#442828;color:#ff8b8b;}
+.empty-state{background:var(--panel);border:0.5px solid var(--border);padding:2rem;text-align:center;color:var(--muted);}
+</style>
+</head>
+<body>
+<nav class="py-3">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="index.html" class="nav-logo">VELVET<span style="color:#fff;">SCREEN</span></a>
+    <div>
+      <a href="booking.html" class="btn btn-ghost me-2">Pesan Tiket</a>
+      <button id="logoutBtn" class="btn btn-danger">Keluar</button>
+    </div>
+  </div>
+</nav>
+<div class="container">
+  <div class="card-panel">
+    <div class="title">Akun Saya</div>
+    <div id="welcomeText" class="user-badge"></div>
+    <div class="user-badge" style="margin-top:.8rem;">Saldo: <strong id="balanceValue">Rp 0</strong></div>
+    <div class="mt-3 d-flex flex-wrap align-items-center gap-2">
+      <input id="topupAmount" type="number" min="1000" step="1000" class="form-control" placeholder="Nominal top-up" style="max-width:200px; background:#16141A; border:.5px solid rgba(201,168,76,.2); color:#fff;">
+      <button id="topupBtn" class="btn btn-gold">Isi Saldo Prototipe</button>
+    </div>
+    <p class="footer-note" style="margin-top:.8rem;color:var(--muted);">Saldo ini adalah prototipe untuk demo aplikasi; bukan uang sungguhan.</p>
+    <p class="footer-note" style="margin-top:.8rem;color:var(--muted);">Semua pesanan disimpan di browser Anda. Batalkan untuk mengembalikan saldo dan kursi.</p>
+  </div>
+  <div class="card-panel">
+    <div class="title">Riwayat Pembelian</div>
+    <div id="ordersContainer"></div>
+  </div>
+</div>
+
+<!-- Cancel Confirmation Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" style="font-family:'Bebas Neue',sans-serif;letter-spacing:.08em;">Konfirmasi Pembatalan</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="color:rgba(255,255,255,.8);font-size:.92rem;">
+        <p id="cancelText">Apakah Anda yakin ingin membatalkan pesanan ini?</p>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,.08);">
+        <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-danger" id="confirmCancelBtn">Ya, Batalkan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function getCurrentUser() {
+  return localStorage.getItem('vs_currentUser');
+}
+function clearCurrentUser() {
+  localStorage.removeItem('vs_currentUser');
+}
+function getHistory() {
+  return JSON.parse(localStorage.getItem('vs_history') || '{}');
+}
+function saveHistory(history) {
+  localStorage.setItem('vs_history', JSON.stringify(history));
+}
+function getReservations() {
+  return JSON.parse(localStorage.getItem('vs_reservations') || '{}');
+}
+function saveReservations(reservations) {
+  localStorage.setItem('vs_reservations', JSON.stringify(reservations));
+}
+function releaseSeats(key, seats) {
+  const reservations = getReservations();
+  if (!reservations[key]) return;
+  reservations[key] = reservations[key].filter(s => !seats.includes(s));
+  if (reservations[key].length === 0) delete reservations[key];
+  saveReservations(reservations);
+}
+function getUsers() {
+  return JSON.parse(localStorage.getItem('vs_users') || '[]');
+}
+function saveUsers(users) {
+  localStorage.setItem('vs_users', JSON.stringify(users));
+}
+function getCurrentUserObject() {
+  const email = getCurrentUser();
+  if (!email) return null;
+  const users = getUsers();
+  return users.find(u => u.email === email) || null;
+}
+function updateUserBalance(amount) {
+  const email = getCurrentUser();
+  if (!email) return;
+  const users = getUsers();
+  const user = users.find(u => u.email === email);
+  if (!user) return;
+  user.balance = (user.balance || 0) + amount;
+  saveUsers(users);
+}
+function showMessage(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.style.position = 'fixed';
+  toast.style.bottom = '1.5rem';
+  toast.style.right = '1.5rem';
+  toast.style.padding = '1rem 1.2rem';
+  toast.style.background = type === 'error' ? 'rgba(204,68,68,.9)' : 'rgba(25,25,25,.95)';
+  toast.style.border = type === 'error' ? '1px solid rgba(204,68,68,.45)' : '1px solid rgba(201,168,76,.35)';
+  toast.style.color = '#fff';
+  toast.style.zIndex = 1100;
+  toast.style.borderRadius = '0';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3600);
+}
+function getOrderKey(order) {
+  return `${order.movieId}|${order.studio}|${order.time}`;
+}
+let selectedCancelOrder = null;
+
+function openCancelModal(orderId) {
+  const user = getCurrentUser();
+  if (!user) return;
+  const history = getHistory();
+  const order = (history[user] || []).find(o => o.id === orderId);
+  if (!order || order.status !== 'active') return;
+  selectedCancelOrder = order;
+  document.getElementById('cancelText').innerHTML = `Apakah Anda yakin ingin membatalkan pesanan <strong>${order.movieTitle}</strong> pada <strong>${order.date}</strong> pukul <strong>${order.time}</strong>?<br><br>Saldo sebesar <strong>Rp ${order.total.toLocaleString('id-ID')}</strong> akan dikembalikan ke akun Anda.`;
+  new bootstrap.Modal(document.getElementById('cancelModal')).show();
+}
+
+function cancelOrder() {
+  if (!selectedCancelOrder) return;
+  const user = getCurrentUser();
+  if (!user) return;
+  const history = getHistory();
+  const orders = history[user] || [];
+  const order = orders.find(o => o.id === selectedCancelOrder.id);
+  if (!order || order.status !== 'active') return;
+  order.status = 'cancelled';
+  saveHistory(history);
+  releaseSeats(getOrderKey(order), order.seats);
+  updateUserBalance(order.total);
+  renderOrders();
+  renderBalance();
+  showMessage(`Pesanan dibatalkan, dan saldo Rp ${order.total.toLocaleString('id-ID')} telah dikembalikan.`);
+  selectedCancelOrder = null;
+  bootstrap.Modal.getInstance(document.getElementById('cancelModal')).hide();
+}
+
+function renderBalance() {
+  const user = getCurrentUserObject();
+  const balance = user ? (user.balance || 0) : 0;
+  document.getElementById('balanceValue').textContent = `Rp ${balance.toLocaleString('id-ID')}`;
+}
+
+function addPrototypeBalance() {
+  const amountInput = document.getElementById('topupAmount');
+  const amount = parseInt(amountInput.value, 10);
+  if (!amount || amount < 1000) {
+    showMessage('Masukkan nominal top-up yang valid minimal Rp 1.000.', 'error');
+    return;
+  }
+  updateUserBalance(amount);
+  renderBalance();
+  showMessage(`Saldo prototipe Rp ${amount.toLocaleString('id-ID')} berhasil ditambahkan.`);
+  amountInput.value = '';
+}
+
+function renderOrders() {
+  const user = getCurrentUser();
+  if (!user) return;
+  const history = getHistory()[user] || [];
+  const container = document.getElementById('ordersContainer');
+  if (!history.length) {
+    container.innerHTML = '<div class="empty-state"><strong>Tidak ada riwayat pembelian.</strong><p style="margin-top:.5rem;color:var(--muted);">Pesan tiket pertama Anda di halaman booking.</p></div>';
+    return;
+  }
+  container.innerHTML = history.map(order => `
+    <div class="order-card">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <div class="order-title">${order.movieTitle}</div>
+          <div class="order-meta">${order.date} · ${order.studio} · ${order.time}</div>
+        </div>
+        <div class="status-pill ${order.status === 'active' ? 'status-active' : 'status-cancel'}">${order.status === 'active' ? 'Aktif' : 'Dibatalkan'}</div>
+      </div>
+      <div class="order-meta">Kode: <strong>${order.code}</strong></div>
+      <div class="order-meta">Total: <strong>Rp ${order.total.toLocaleString('id-ID')}</strong></div>
+      <div class="order-seats">${order.seats.map(seat => `<span class="seat-chip">${seat}</span>`).join('')}</div>
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="order-meta">Waktu dibuat: ${new Date(order.createdAt).toLocaleString('id-ID')}</div>
+        ${order.status === 'active' ? `<button class="btn btn-danger" onclick="openCancelModal(${order.id})">Batalkan</button>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function initAccount() {
+  const user = getCurrentUser();
+  if (!user) {
+    location.href = 'login.html?return=account.html';
+    return;
+  }
+  document.getElementById('welcomeText').textContent = user;
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    clearCurrentUser();
+    location.href = 'login.html';
+  });
+  document.getElementById('confirmCancelBtn').addEventListener('click', cancelOrder);
+  document.getElementById('topupBtn').addEventListener('click', addPrototypeBalance);
+  renderBalance();
+  renderOrders();
+}
+initAccount();
+</script>
+</body>
+</html>

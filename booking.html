@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pesan Tiket — VelvetScreen</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C9A84C;--gold-light:#E8C97A;--black:#0A0A0A;--deep:#111014;--panel:#16141A;--border:rgba(201,168,76,0.2);--muted:rgba(255,255,255,0.45);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--black);color:#fff;font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden;}
+::-webkit-scrollbar{width:3px;} ::-webkit-scrollbar-thumb{background:var(--gold);}
+
+/* NAVBAR */
+#navbar{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.2rem 0;background:rgba(10,10,10,0.95);backdrop-filter:blur(14px);border-bottom:0.5px solid var(--border);}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:.15em;color:var(--gold)!important;text-decoration:none;}
+.nav-logo span{color:#fff;}
+.navbar-nav .nav-link{color:rgba(255,255,255,0.65)!important;font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;transition:color .2s;}
+.navbar-nav .nav-link:hover,.navbar-nav .nav-link.active{color:var(--gold)!important;}
+.btn-ticket{background:var(--gold);border:none;color:var(--black);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;padding:.45rem 1.2rem;border-radius:0;transition:all .25s;cursor:pointer;}
+.btn-ticket:hover{background:var(--gold-light);}
+
+/* PAGE */
+.page-body{padding-top:100px;padding-bottom:5rem;min-height:100vh;}
+
+/* STEP INDICATOR */
+.steps{display:flex;align-items:center;gap:0;margin-bottom:2.5rem;}
+.step{display:flex;align-items:center;gap:.6rem;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.step.active{color:var(--gold);}
+.step.done{color:rgba(255,255,255,.5);}
+.step-num{width:24px;height:24px;border-radius:50%;border:.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:500;}
+.step.active .step-num{background:var(--gold);border-color:var(--gold);color:var(--black);}
+.step.done .step-num{background:rgba(255,255,255,.2);border-color:transparent;}
+.step-line{flex:1;height:.5px;background:var(--border);margin:0 .8rem;}
+
+/* FILM SELECT */
+.film-select-card{background:var(--panel);border:.5px solid var(--border);padding:1.2rem;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:1rem;margin-bottom:.6rem;}
+.film-select-card:hover,.film-select-card.selected{border-color:var(--gold);background:#1A1820;}
+.film-select-card.selected::before{content:'✦';color:var(--gold);margin-right:.3rem;font-size:.7rem;}
+.film-thumb{width:50px;height:75px;object-fit:cover;flex-shrink:0;filter:brightness(.85);}
+.film-select-name{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;}
+.film-select-meta{font-size:.68rem;color:var(--muted);margin-top:.2rem;}
+
+/* STUDIO BUTTONS */
+.studio-btn{background:var(--panel);border:.5px solid var(--border);color:rgba(255,255,255,.65);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:.6rem 1.2rem;border-radius:0;cursor:pointer;transition:all .25s;font-family:'DM Sans',sans-serif;}
+.studio-btn:hover,.studio-btn.selected{background:rgba(201,168,76,.12);border-color:var(--gold);color:var(--gold);}
+
+/* TIME BUTTONS */
+.time-btn{background:var(--panel);border:.5px solid var(--border);color:rgba(255,255,255,.65);font-size:.75rem;padding:.5rem 1rem;border-radius:0;cursor:pointer;transition:all .25s;font-family:'DM Sans',sans-serif;}
+.time-btn:hover,.time-btn.selected{background:var(--gold);border-color:var(--gold);color:var(--black);font-weight:500;}
+
+/* CANVAS CONTAINER (Materi Pertemuan 1: HTML Canvas) */
+.canvas-wrap{background:var(--panel);border:.5px solid var(--border);padding:1.5rem;overflow-x:auto;}
+.screen-label{text-align:center;margin-bottom:1.2rem;}
+.screen-svg{display:block;margin:0 auto 1.5rem;}
+
+/* Canvas cursor */
+#seatCanvas{cursor:pointer;display:block;margin:0 auto;}
+
+/* Legend */
+.legend-item{display:flex;align-items:center;gap:.5rem;font-size:.7rem;color:var(--muted);}
+.legend-box{width:14px;height:14px;border-radius:2px;flex-shrink:0;}
+
+/* SUMMARY PANEL */
+.summary-panel{background:var(--panel);border:.5px solid var(--border);padding:1.5rem;position:sticky;top:100px;}
+.summary-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.08em;margin-bottom:1.2rem;}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:.5px solid rgba(255,255,255,.06);font-size:.78rem;}
+.summary-row:last-of-type{border-bottom:none;}
+.summary-label{color:var(--muted);}
+.summary-val{color:#fff;font-weight:400;}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:1rem 0 0;margin-top:.5rem;border-top:.5px solid var(--border);}
+.total-label{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.total-price{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.06em;color:var(--gold);}
+.btn-confirm{background:var(--gold);border:none;color:var(--black);font-size:.78rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;padding:.9rem;width:100%;border-radius:0;transition:all .25s;cursor:pointer;margin-top:1rem;}
+.btn-confirm:hover{background:var(--gold-light);}
+.btn-confirm:disabled{opacity:.35;cursor:not-allowed;}
+
+/* Seat chip */
+.seat-chip{background:rgba(201,168,76,.15);border:.5px solid var(--gold);color:var(--gold);font-size:.65rem;padding:.2rem .55rem;margin:.15rem;display:inline-block;}
+
+/* CSS3 Transition on panels */
+.booking-panel{transition:opacity .35s ease,transform .35s ease;}
+.booking-panel.hidden{opacity:0;pointer-events:none;transform:translateY(8px);}
+
+/* Toast */
+.toast-wrap{position:fixed;bottom:2rem;right:2rem;z-index:9999;}
+.toast-box{background:var(--deep);border:.5px solid var(--gold);color:#fff;padding:.8rem 1.2rem;font-size:.78rem;min-width:240px;animation:toastIn .3s ease;}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* Confirm Modal */
+.modal-content{background:var(--deep);border:.5px solid var(--border);border-radius:0;color:#fff;}
+.modal-header{border-bottom:.5px solid var(--border);}
+.btn-close{filter:invert(1);}
+.ticket-block{background:var(--panel);border:.5px dashed var(--border);padding:1.5rem;text-align:center;margin:1rem 0;}
+.ticket-code{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.2em;color:var(--gold);}
+
+@media(max-width:768px){.summary-panel{position:static;margin-top:2rem;}}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <a href="index.html" class="nav-logo">VELVET<span>SCREEN</span></a>
+      <div class="d-none d-lg-flex">
+        <ul class="navbar-nav flex-row gap-1 mb-0">
+          <li><a class="nav-link px-3" href="index.html">Beranda</a></li>
+          <li><a class="nav-link px-3" href="now-showing.html">Sedang Tayang</a></li>
+          <li><a class="nav-link px-3" href="coming-soon.html">Segera Hadir</a></li>
+          <li><a class="nav-link active px-3" href="booking.html">Pesan Tiket</a></li>
+          <li><a class="nav-link px-3" href="location.html">Lokasi</a></li>
+        </ul>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a href="movies.html" class="btn-ticket"><i class="fa fa-arrow-left me-1"></i> Kembali</a>
+        <a id="accountButton" href="login.html?return=booking.html" class="btn-ticket">Masuk</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="page-body">
+  <div class="container mb-3" id="loginNotice" style="display:none;">
+    <div style="border:1px solid rgba(201,168,76,.25);padding:1rem 1.2rem;background:rgba(201,168,76,.07);color:#fff;display:flex;justify-content:space-between;align-items:center;gap:1rem;">
+      <div>
+        <strong style="color:var(--gold);">Silakan masuk terlebih dahulu.</strong>
+        <div style="font-size:.85rem;color:var(--muted);">Riwayat pembelian akan tersimpan di akun Anda.</div>
+      </div>
+      <a href="login.html?return=booking.html" class="btn-ticket" style="padding:.6rem 1rem;">Masuk</a>
+    </div>
+  </div>
+  <div class="container">
+    <!-- STEP INDICATOR -->
+    <div class="steps mb-4">
+      <div class="step done" id="s1"><div class="step-num"><i class="fa fa-check" style="font-size:.5rem;"></i></div><span class="d-none d-md-inline">Pilih Film</span></div>
+      <div class="step-line"></div>
+      <div class="step active" id="s2"><div class="step-num">2</div><span class="d-none d-md-inline">Jadwal & Studio</span></div>
+      <div class="step-line"></div>
+      <div class="step" id="s3"><div class="step-num">3</div><span class="d-none d-md-inline">Pilih Kursi</span></div>
+      <div class="step-line"></div>
+      <div class="step" id="s4"><div class="step-num">4</div><span class="d-none d-md-inline">Konfirmasi</span></div>
+    </div>
+
+    <div class="row g-4">
+      <!-- LEFT COLUMN -->
+      <div class="col-lg-8">
+
+        <!-- STEP 1: FILM -->
+        <div class="mb-4">
+          <p style="font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem;"><i class="fa fa-film me-2"></i>Pilih Film</p>
+          <div id="filmList">
+            <div style="text-align:center;padding:2rem;color:var(--muted);font-size:.8rem;">
+              <div style="width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem;"></div>
+              Memuat daftar film...
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: STUDIO & JADWAL -->
+        <div class="mb-4 booking-panel" id="studioPanel" style="display:none;">
+          <p style="font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem;"><i class="fa fa-tv me-2"></i>Pilih Studio</p>
+          <div class="d-flex flex-wrap gap-2 mb-4" id="studioButtons"></div>
+
+          <p style="font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem;"><i class="fa fa-clock me-2"></i>Pilih Jadwal</p>
+          <div class="d-flex flex-wrap gap-2" id="timeButtons"></div>
+        </div>
+
+        <!-- STEP 3: SEAT CANVAS (Materi Pertemuan 1: HTML Canvas) -->
+        <div class="booking-panel" id="seatPanel" style="display:none;">
+          <p style="font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;"><i class="fa fa-couch me-2"></i>Pilih Kursi</p>
+
+          <div class="canvas-wrap">
+            <!-- SVG Screen Visual (Materi Pertemuan 2 & 3: HTML SVG) -->
+            <div class="screen-label">
+              <svg class="screen-svg" width="340" height="28" viewBox="0 0 340 28">
+                <defs>
+                  <linearGradient id="screenGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:transparent"/>
+                    <stop offset="30%" style="stop-color:#C9A84C;stop-opacity:.7"/>
+                    <stop offset="50%" style="stop-color:#C9A84C"/>
+                    <stop offset="70%" style="stop-color:#C9A84C;stop-opacity:.7"/>
+                    <stop offset="100%" style="stop-color:transparent"/>
+                  </linearGradient>
+                </defs>
+                <path d="M10,5 Q170,0 330,5 L330,22 Q170,28 10,22 Z" fill="url(#screenGrad)" opacity=".25"/>
+                <path d="M10,5 Q170,0 330,5" fill="none" stroke="#C9A84C" stroke-width="1.5" opacity=".8"/>
+                <text x="170" y="20" text-anchor="middle" fill="#C9A84C" font-size="9" letter-spacing="4" font-family="'DM Sans',sans-serif" opacity=".7">LAYAR</text>
+              </svg>
+            </div>
+
+            <!-- HTML CANVAS — Seat Selector (Materi Pertemuan 1) -->
+            <canvas id="seatCanvas" width="580" height="380"></canvas>
+
+            <!-- Legend -->
+            <div class="d-flex justify-content-center gap-4 mt-3 flex-wrap">
+              <div class="legend-item"><div class="legend-box" style="background:#2A2A35;border:1px solid #444;"></div> Tersedia</div>
+              <div class="legend-item"><div class="legend-box" style="background:#C9A84C;"></div> Dipilih</div>
+              <div class="legend-item"><div class="legend-box" style="background:#3D2020;border:1px solid #553333;"></div> Tidak Tersedia</div>
+              <div class="legend-item"><div class="legend-box" style="background:#1A1A40;border:1px solid #333366;"></div> Premium</div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /col-lg-8 -->
+
+      <!-- RIGHT COLUMN: SUMMARY -->
+      <div class="col-lg-4">
+        <div class="summary-panel">
+          <div class="summary-title">RINGKASAN</div>
+
+          <div class="summary-row">
+            <span class="summary-label">Film</span>
+            <span class="summary-val" id="sumFilm" style="text-align:right;max-width:160px;font-size:.75rem;">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Studio</span>
+            <span class="summary-val" id="sumStudio">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Jadwal</span>
+            <span class="summary-val" id="sumTime">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Tanggal</span>
+            <span class="summary-val" id="sumDate">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Kursi</span>
+            <span class="summary-val" id="sumSeats" style="text-align:right;max-width:160px;font-size:.72rem;">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Jumlah</span>
+            <span class="summary-val" id="sumCount">0 kursi</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Harga/kursi</span>
+            <span class="summary-val" id="sumPrice">—</span>
+          </div>
+
+          <div class="total-row">
+            <div class="total-label">Total</div>
+            <div class="total-price" id="sumTotal">Rp 0</div>
+          </div>
+
+          <button class="btn-confirm" id="confirmBtn" disabled onclick="openConfirm()">
+            <i class="fa fa-check-circle me-2"></i>Konfirmasi Pesanan
+          </button>
+
+          <!-- Note -->
+          <p style="font-size:.65rem;color:var(--muted);text-align:center;margin-top:1rem;line-height:1.6;">
+            <i class="fa fa-shield-alt me-1" style="color:var(--gold);"></i>
+            Pembayaran aman. Tiket akan dikirim ke email.
+          </p>
+        </div>
+      </div>
+    </div><!-- /row -->
+  </div><!-- /container -->
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" style="font-family:'Bebas Neue',sans-serif;letter-spacing:.1em;">KONFIRMASI PESANAN</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div id="confirmDetails" style="font-size:.8rem;line-height:2;color:rgba(255,255,255,.7);"></div>
+        <div class="ticket-block" id="ticketBlock" style="display:none;">
+          <div style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;">Kode Tiket</div>
+          <div class="ticket-code" id="ticketCode"></div>
+          <!-- SVG Barcode-style decoration (Materi SVG) -->
+          <svg width="180" height="30" viewBox="0 0 180 30" style="margin-top:1rem;opacity:.4;">
+            <rect x="0" y="0" width="2" height="30" fill="#C9A84C"/>
+            <rect x="5" y="0" width="4" height="30" fill="#C9A84C"/>
+            <rect x="12" y="0" width="1" height="30" fill="#C9A84C"/>
+            <rect x="16" y="0" width="3" height="30" fill="#C9A84C"/>
+            <rect x="22" y="0" width="2" height="30" fill="#C9A84C"/>
+            <rect x="27" y="0" width="5" height="30" fill="#C9A84C"/>
+            <rect x="35" y="0" width="1" height="30" fill="#C9A84C"/>
+            <rect x="40" y="0" width="3" height="30" fill="#C9A84C"/>
+            <rect x="46" y="0" width="2" height="30" fill="#C9A84C"/>
+            <rect x="52" y="0" width="4" height="30" fill="#C9A84C"/>
+            <rect x="60" y="0" width="1" height="30" fill="#C9A84C"/>
+            <rect x="64" y="0" width="6" height="30" fill="#C9A84C"/>
+            <rect x="73" y="0" width="2" height="30" fill="#C9A84C"/>
+            <rect x="78" y="0" width="3" height="30" fill="#C9A84C"/>
+            <rect x="84" y="0" width="1" height="30" fill="#C9A84C"/>
+            <rect x="88" y="0" width="5" height="30" fill="#C9A84C"/>
+            <rect x="96" y="0" width="2" height="30" fill="#C9A84C"/>
+            <rect x="102" y="0" width="1" height="30" fill="#C9A84C"/>
+            <rect x="106" y="0" width="4" height="30" fill="#C9A84C"/>
+            <rect x="113" y="0" width="2" height="30" fill="#C9A84C"/>
+            <rect x="118" y="0" width="3" height="30" fill="#C9A84C"/>
+            <rect x="125" y="0" width="1" height="30" fill="#C9A84C"/>
+            <rect x="130" y="0" width="6" height="30" fill="#C9A84C"/>
+            <rect x="140" y="0" width="2" height="30" fill="#C9A84C"/>
+            <rect x="145" y="0" width="4" height="30" fill="#C9A84C"/>
+            <rect x="152" y="0" width="1" height="30" fill="#C9A84C"/>
+            <rect x="157" y="0" width="3" height="30" fill="#C9A84C"/>
+            <rect x="163" y="0" width="2" height="30" fill="#C9A84C"/>
+            <rect x="168" y="0" width="5" height="30" fill="#C9A84C"/>
+            <rect x="176" y="0" width="2" height="30" fill="#C9A84C"/>
+          </svg>
+        </div>
+        <div class="d-flex gap-2 mt-3">
+          <button class="btn-confirm" id="payBtn" onclick="processPayment()">
+            <i class="fa fa-credit-card me-2"></i>Bayar Sekarang
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════ */
+let allMovies = [];
+let selectedMovie = null;
+let selectedStudio = null;
+let selectedTime = null;
+let selectedSeats = [];
+const TODAY = new Date().toLocaleDateString('id-ID', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+function getCurrentUser() {
+  return localStorage.getItem('vs_currentUser');
+}
+
+function setCurrentUser(email) {
+  localStorage.setItem('vs_currentUser', email);
+}
+
+function getUsers() {
+  return JSON.parse(localStorage.getItem('vs_users') || '[]');
+}
+
+function saveUsers(users) {
+  localStorage.setItem('vs_users', JSON.stringify(users));
+}
+
+function getCurrentUserObject() {
+  const email = getCurrentUser();
+  if (!email) return null;
+  const users = getUsers();
+  return users.find(u => u.email === email) || null;
+}
+
+function updateUserBalance(amount) {
+  const email = getCurrentUser();
+  if (!email) return;
+  const users = getUsers();
+  const user = users.find(u => u.email === email);
+  if (!user) return;
+  user.balance = (user.balance || 0) + amount;
+  saveUsers(users);
+}
+
+function getHistory() {
+  return JSON.parse(localStorage.getItem('vs_history') || '{}');
+}
+
+function saveHistory(history) {
+  localStorage.setItem('vs_history', JSON.stringify(history));
+}
+
+function addOrder(order) {
+  const user = getCurrentUser();
+  if (!user) return;
+  const history = getHistory();
+  history[user] = [...(history[user] || []), order];
+  saveHistory(history);
+}
+
+function getReservations() {
+  return JSON.parse(localStorage.getItem('vs_reservations') || '{}');
+}
+
+function saveReservations(reservations) {
+  localStorage.setItem('vs_reservations', JSON.stringify(reservations));
+}
+
+function reserveSeats(key, seats) {
+  const reservations = getReservations();
+  reservations[key] = [...new Set([...(reservations[key] || []), ...seats])];
+  saveReservations(reservations);
+}
+
+function releaseSeats(key, seats) {
+  const reservations = getReservations();
+  if (!reservations[key]) return;
+  reservations[key] = reservations[key].filter(s => !seats.includes(s));
+  if (reservations[key].length === 0) delete reservations[key];
+  saveReservations(reservations);
+}
+
+function getReservedSeats(key) {
+  return getReservations()[key] || [];
+}
+
+function renderAccountButton() {
+  const btn = document.getElementById('accountButton');
+  const user = getCurrentUser();
+  if (user) {
+    btn.textContent = 'Akun';
+    btn.href = 'account.html';
+  } else {
+    btn.textContent = 'Masuk';
+    btn.href = 'login.html?return=booking.html';
+  }
+}
+
+function updateLoginNotice() {
+  const notice = document.getElementById('loginNotice');
+  const loggedIn = !!getCurrentUser();
+  notice.style.display = loggedIn ? 'none' : '';
+}
+
+function getShowKey() {
+  return selectedMovie && selectedStudio && selectedTime ? `${selectedMovie.id}|${selectedStudio}|${selectedTime}` : '';
+}
+
+function loadReservedSeats() {
+  const key = getShowKey();
+  const reserved = key ? getReservedSeats(key) : [];
+  generateTakenSeats();
+  reserved.forEach(seat => takenSeats.add(seat));
+}
+
+/* ═══ AJAX Fetch (Materi Pertemuan 8 & 10) ═══ */
+async function loadMovies() {
+  const res = await fetch('movies.json');
+  allMovies = await res.json();
+  const nowShowing = allMovies.filter(m => m.status === 'now_showing');
+  const list = document.getElementById('filmList');
+  list.innerHTML = nowShowing.map(m => `
+    <div class="film-select-card" data-id="${m.id}" onclick="selectFilm(${m.id})">
+      <img src="${m.poster}" class="film-thumb" alt="${m.title}">
+      <div>
+        <div class="film-select-name">${m.title}</div>
+        <div class="film-select-meta">${m.genre} · ${m.duration} · ${m.age}</div>
+        <div style="font-size:.68rem;color:var(--gold);margin-top:.3rem;">Mulai Rp ${m.price.toLocaleString('id-ID')}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Check URL params
+  const params = new URLSearchParams(location.search);
+  const pid = params.get('id');
+  const ptime = params.get('time');
+  if (pid) {
+    selectFilm(parseInt(pid));
+    if (ptime) setTimeout(() => selectTime(ptime), 300);
+  }
+}
+
+function selectFilm(id) {
+  selectedMovie = allMovies.find(m => m.id === id);
+  if (!selectedMovie) return;
+  document.querySelectorAll('.film-select-card').forEach(c => c.classList.toggle('selected', parseInt(c.dataset.id) === id));
+  document.getElementById('sumFilm').textContent = selectedMovie.title;
+  document.getElementById('sumDate').textContent = TODAY;
+  selectedStudio = null; selectedTime = null; selectedSeats = [];
+  buildStudioPanel();
+  document.getElementById('studioPanel').style.display = '';
+  document.getElementById('seatPanel').style.display = 'none';
+  updateStep(2);
+  updateSummary();
+  document.getElementById('studioPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function buildStudioPanel() {
+  const sb = document.getElementById('studioButtons');
+  const prices = {IMAX: 1.6, 'Gold Class': 2.5, '4DX': 1.8, Reguler: 1};
+  sb.innerHTML = selectedMovie.studios.map(s => `
+    <button class="studio-btn" data-studio="${s}" onclick="selectStudio('${s}')">
+      ${s} <span style="font-size:.6rem;opacity:.7">· Rp ${Math.round(selectedMovie.price * (prices[s]||1)).toLocaleString('id-ID')}</span>
+    </button>
+  `).join('');
+
+  const tb = document.getElementById('timeButtons');
+  tb.innerHTML = selectedMovie.showtimes.map(t => `
+    <button class="time-btn" onclick="selectTime('${t}')">${t}</button>
+  `).join('');
+}
+
+function selectStudio(s) {
+  selectedStudio = s;
+  document.querySelectorAll('.studio-btn').forEach(b => b.classList.toggle('selected', b.dataset.studio === s));
+  const prices = {IMAX: 1.6, 'Gold Class': 2.5, '4DX': 1.8, Reguler: 1};
+  document.getElementById('sumStudio').textContent = s;
+  selectedSeats = [];
+  if (selectedTime) showSeatCanvas();
+  updateSummary();
+}
+
+function selectTime(t) {
+  selectedTime = t;
+  document.querySelectorAll('.time-btn').forEach(b => b.classList.toggle('selected', b.textContent.trim() === t));
+  document.getElementById('sumTime').textContent = t;
+  selectedSeats = [];
+  if (selectedStudio) showSeatCanvas();
+  updateSummary();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HTML CANVAS — Seat Selector (Materi Pertemuan 1: HTML Canvas)
+═══════════════════════════════════════════════════════════ */
+const ROWS = ['A','B','C','D','E','F','G','H'];
+const COLS = 12;
+const SEAT_W = 34, SEAT_H = 28, GAP_X = 8, GAP_Y = 10;
+const OFFSET_X = 48, OFFSET_Y = 20;
+
+// Randomly mark some seats as taken (simulated)
+let takenSeats = new Set();
+
+function generateTakenSeats() {
+  takenSeats.clear();
+  const count = 18 + Math.floor(Math.random() * 14);
+  while (takenSeats.size < count) {
+    const r = Math.floor(Math.random() * ROWS.length);
+    const c = Math.floor(Math.random() * COLS) + 1;
+    takenSeats.add(`${ROWS[r]}${c}`);
+  }
+}
+
+function showSeatCanvas() {
+  document.getElementById('seatPanel').style.display = '';
+  updateStep(3);
+  loadReservedSeats();
+  drawCanvas();
+  document.getElementById('seatPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+/* HTML Canvas drawing (Materi Pertemuan 1) */
+function drawCanvas() {
+  const canvas = document.getElementById('seatCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Responsive canvas width
+  const containerW = canvas.parentElement.clientWidth - 48;
+  const scale = Math.min(1, containerW / 580);
+  canvas.width = Math.min(580, containerW);
+  canvas.height = 380 * scale;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.scale(scale, scale);
+
+  ctx.clearRect(0, 0, 580, 380);
+
+  // Premium rows (A, B)
+  const premiumRows = new Set(['A','B']);
+
+  ROWS.forEach((row, ri) => {
+    // Row label
+    ctx.font = '11px "DM Sans", sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.textAlign = 'right';
+    ctx.fillText(row, OFFSET_X - 8, OFFSET_Y + ri*(SEAT_H + GAP_Y) + SEAT_H/2 + 4);
+
+    for (let c = 1; c <= COLS; c++) {
+      const seatId = `${row}${c}`;
+      const x = OFFSET_X + (c-1)*(SEAT_W + GAP_X);
+      const y = OFFSET_Y + ri*(SEAT_H + GAP_Y);
+
+      // Gap in the middle (aisle)
+      const drawX = c <= 6 ? x : x + 16;
+
+      const isTaken = takenSeats.has(seatId);
+      const isSelected = selectedSeats.includes(seatId);
+      const isPremium = premiumRows.has(row);
+
+      // Seat base shape (rounded rect)
+      ctx.beginPath();
+      roundRect(ctx, drawX, y, SEAT_W, SEAT_H, 4);
+
+      if (isSelected) {
+        // Selected: gold
+        ctx.fillStyle = '#C9A84C';
+        ctx.fill();
+        ctx.strokeStyle = '#E8C97A';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Seat back indicator
+        ctx.fillStyle = '#A07830';
+        ctx.fillRect(drawX + 4, y + 2, SEAT_W - 8, 5);
+
+      } else if (isTaken) {
+        // Taken: dark red
+        ctx.fillStyle = '#2D1515';
+        ctx.fill();
+        ctx.strokeStyle = '#4A2525';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        // X mark
+        ctx.strokeStyle = 'rgba(255,80,80,.4)';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(drawX+8, y+8); ctx.lineTo(drawX+SEAT_W-8, y+SEAT_H-8);
+        ctx.moveTo(drawX+SEAT_W-8, y+8); ctx.lineTo(drawX+8, y+SEAT_H-8);
+        ctx.stroke();
+
+      } else if (isPremium) {
+        // Premium: dark blue
+        ctx.fillStyle = '#141430';
+        ctx.fill();
+        ctx.strokeStyle = '#2A2A5A';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        // Seat back
+        ctx.fillStyle = '#1E1E4A';
+        ctx.fillRect(drawX + 4, y + 2, SEAT_W - 8, 5);
+
+      } else {
+        // Available: dark gray
+        ctx.fillStyle = '#22212E';
+        ctx.fill();
+        ctx.strokeStyle = '#3A3848';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        // Seat back
+        ctx.fillStyle = '#2C2B38';
+        ctx.fillRect(drawX + 4, y + 2, SEAT_W - 8, 5);
+      }
+
+      // Seat number (small text)
+      ctx.font = '8px "DM Sans",sans-serif';
+      ctx.fillStyle = isSelected ? '#2A1800' : isTaken ? 'rgba(255,255,255,.15)' : 'rgba(255,255,255,.3)';
+      ctx.textAlign = 'center';
+      ctx.fillText(c, drawX + SEAT_W/2, y + SEAT_H - 5);
+    }
+
+    // Row price label
+    const labelX = OFFSET_X + COLS*(SEAT_W + GAP_X) + 20;
+    ctx.font = '9px "DM Sans",sans-serif';
+    ctx.fillStyle = premiumRows.has(row) ? '#5555AA' : 'rgba(255,255,255,.2)';
+    ctx.textAlign = 'left';
+    if (premiumRows.has(row)) ctx.fillText('VIP', labelX, OFFSET_Y + ri*(SEAT_H+GAP_Y)+SEAT_H/2+4);
+  });
+
+  // Aisle label
+  ctx.font = '9px "DM Sans",sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,.15)';
+  ctx.textAlign = 'center';
+  ctx.fillText('LORONG', OFFSET_X + 6*(SEAT_W+GAP_X)+8, 14);
+}
+
+// Helper: rounded rect
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r);
+  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h);
+  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r);
+  ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath();
+}
+
+// Canvas click handler (Materi Canvas: event-driven interaction)
+document.getElementById('seatCanvas').addEventListener('click', function(e) {
+  const canvas = this;
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+
+  // Account for scale factor
+  const containerW = canvas.parentElement.clientWidth - 48;
+  const scaleFactor = Math.min(1, containerW / 580);
+
+  const rawX = (e.clientX - rect.left) * scaleX / scaleFactor;
+  const rawY = (e.clientY - rect.top) * scaleY / scaleFactor;
+
+  ROWS.forEach((row, ri) => {
+    for (let c = 1; c <= COLS; c++) {
+      const seatId = `${row}${c}`;
+      const x = OFFSET_X + (c-1)*(SEAT_W + GAP_X);
+      const y = OFFSET_Y + ri*(SEAT_H + GAP_Y);
+      const drawX = c <= 6 ? x : x + 16;
+
+      if (rawX >= drawX && rawX <= drawX+SEAT_W && rawY >= y && rawY <= y+SEAT_H) {
+        if (takenSeats.has(seatId)) { showToast('Kursi ini sudah terisi.', 'error'); return; }
+        const idx = selectedSeats.indexOf(seatId);
+        if (idx === -1) {
+          if (selectedSeats.length >= 8) { showToast('Maksimal 8 kursi per pesanan.', 'warn'); return; }
+          selectedSeats.push(seatId);
+        } else {
+          selectedSeats.splice(idx, 1);
+        }
+        drawCanvas();
+        updateSummary();
+      }
+    }
+  });
+});
+
+/* ═══ SUMMARY UPDATE ═══ */
+function updateSummary() {
+  const prices = {IMAX:1.6,'Gold Class':2.5,'4DX':1.8,Reguler:1};
+  const basePrice = selectedMovie ? selectedMovie.price : 0;
+  const mult = selectedStudio ? (prices[selectedStudio] || 1) : 1;
+  const pricePerSeat = Math.round(basePrice * mult);
+  const total = pricePerSeat * selectedSeats.length;
+
+  document.getElementById('sumPrice').textContent = selectedStudio ? 'Rp ' + pricePerSeat.toLocaleString('id-ID') : '—';
+  document.getElementById('sumCount').textContent = selectedSeats.length + ' kursi';
+  document.getElementById('sumTotal').textContent = 'Rp ' + total.toLocaleString('id-ID');
+
+  if (selectedSeats.length > 0) {
+    document.getElementById('sumSeats').innerHTML = selectedSeats.map(s => `<span class="seat-chip">${s}</span>`).join('');
+  } else {
+    document.getElementById('sumSeats').textContent = '—';
+  }
+
+  const loggedIn = !!getCurrentUser();
+  const canConfirm = selectedMovie && selectedStudio && selectedTime && selectedSeats.length > 0 && loggedIn;
+  document.getElementById('confirmBtn').disabled = !canConfirm;
+  updateLoginNotice();
+  if (selectedMovie && selectedStudio && selectedTime && selectedSeats.length > 0) updateStep(4);
+}
+
+function updateStep(n) {
+  ['s1','s2','s3','s4'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.className = 'step ' + (i+1 < n ? 'done' : i+1 === n ? 'active' : '');
+    if (i+1 < n) el.querySelector('.step-num').innerHTML = '<i class="fa fa-check" style="font-size:.5rem;"></i>';
+    else el.querySelector('.step-num').textContent = i+1;
+  });
+}
+
+function openConfirm() {
+  if (!selectedMovie || !selectedStudio || !selectedTime || !selectedSeats.length) return;
+  const prices = {IMAX:1.6,'Gold Class':2.5,'4DX':1.8,Reguler:1};
+  const pricePerSeat = Math.round(selectedMovie.price * (prices[selectedStudio]||1));
+  const total = pricePerSeat * selectedSeats.length;
+
+  document.getElementById('confirmDetails').innerHTML = `
+    <table class="w-100" style="border-collapse:collapse;">
+      <tr><td style="color:var(--muted);padding:.3rem 0;width:120px;">Film</td><td style="color:#fff;font-weight:400;">${selectedMovie.title}</td></tr>
+      <tr><td style="color:var(--muted);padding:.3rem 0;">Tanggal</td><td style="color:#fff;">${TODAY}</td></tr>
+      <tr><td style="color:var(--muted);padding:.3rem 0;">Studio</td><td style="color:#fff;">${selectedStudio}</td></tr>
+      <tr><td style="color:var(--muted);padding:.3rem 0;">Jam</td><td style="color:#fff;">${selectedTime}</td></tr>
+      <tr><td style="color:var(--muted);padding:.3rem 0;">Kursi</td><td style="color:var(--gold);">${selectedSeats.join(', ')}</td></tr>
+      <tr><td style="color:var(--muted);padding:.3rem 0;">Total</td><td style="color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.06em;">Rp ${total.toLocaleString('id-ID')}</td></tr>
+    </table>
+  `;
+  document.getElementById('ticketBlock').style.display = 'none';
+  document.getElementById('payBtn').style.display = '';
+  new bootstrap.Modal(document.getElementById('confirmModal')).show();
+}
+
+function processPayment() {
+  const userEmail = getCurrentUser();
+  if (!userEmail) {
+    showToast('Anda harus masuk untuk menyelesaikan pembayaran.', 'error');
+    return;
+  }
+
+  const prices = {IMAX:1.6,'Gold Class':2.5,'4DX':1.8,Reguler:1};
+  const pricePerSeat = Math.round(selectedMovie.price * (prices[selectedStudio]||1));
+  const total = pricePerSeat * selectedSeats.length;
+  const user = getCurrentUserObject();
+  if (!user) {
+    showToast('Akun tidak ditemukan. Silakan masuk kembali.', 'error');
+    return;
+  }
+  const balance = user.balance || 0;
+  if (balance < total) {
+    showToast('Saldo tidak mencukupi. Silakan top up atau pilih tiket yang lebih sedikit.', 'error');
+    return;
+  }
+
+  updateUserBalance(-total);
+  const code = 'VS-' + Math.random().toString(36).slice(2,6).toUpperCase() + '-' + Date.now().toString().slice(-4);
+  const order = {
+    id: Date.now(),
+    code,
+    movieId: selectedMovie.id,
+    movieTitle: selectedMovie.title,
+    studio: selectedStudio,
+    time: selectedTime,
+    date: TODAY,
+    seats: [...selectedSeats],
+    pricePerSeat,
+    total,
+    status: 'active',
+    createdAt: new Date().toISOString()
+  };
+  addOrder(order);
+  reserveSeats(getShowKey(), order.seats);
+
+  document.getElementById('ticketCode').textContent = code;
+  document.getElementById('ticketBlock').style.display = '';
+  document.getElementById('payBtn').style.display = 'none';
+  document.getElementById('payBtn').disabled = true;
+  showToast('Tiket berhasil dipesan! Kode: ' + code + ' dan saldo berhasil dikurangi.');
+}
+
+/* ═══ TOAST NOTIFICATION ═══ */
+function showToast(msg, type) {
+  const colors = {success:'var(--gold)',error:'#cc4444',warn:'#cc8800'};
+  const icons  = {success:'check-circle',error:'times-circle',warn:'exclamation-triangle'};
+  const wrap = document.getElementById('toastWrap');
+  const div = document.createElement('div');
+  div.className = 'toast-box';
+  div.innerHTML = `<i class="fa fa-${icons[type]||'info-circle'} me-2" style="color:${colors[type]||'var(--gold)'}"></i>${msg}`;
+  wrap.appendChild(div);
+  setTimeout(() => div.remove(), 3200);
+}
+
+// Init
+window.addEventListener('resize', () => { if (document.getElementById('seatPanel').style.display !== 'none') drawCanvas(); });
+loadMovies();
+renderAccountButton();
+updateLoginNotice();
+
+/* CSS3 @keyframes for spinner (Materi Pertemuan 6) */
+const style = document.createElement('style');
+style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+document.head.appendChild(style);
+</script>
+</body>
+</html>

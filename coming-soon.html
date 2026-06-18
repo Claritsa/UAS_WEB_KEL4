@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Segera Hadir — VelvetScreen</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C9A84C;--gold-light:#E8C97A;--black:#0A0A0A;--deep:#111014;--panel:#16141A;--border:rgba(201,168,76,0.2);--muted:rgba(255,255,255,0.45);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--black);color:#fff;font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden;}
+::-webkit-scrollbar{width:3px;} ::-webkit-scrollbar-thumb{background:var(--gold);}
+
+#navbar{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.2rem 0;background:rgba(10,10,10,0.95);backdrop-filter:blur(14px);border-bottom:0.5px solid var(--border);}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:.15em;color:var(--gold)!important;text-decoration:none;}
+.nav-logo span{color:#fff;}
+.nav-link-item{color:rgba(255,255,255,0.65);font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;padding:.4rem .9rem;transition:color .2s;display:inline-block;}
+.nav-link-item:hover,.nav-link-item.active{color:var(--gold);}
+.btn-ticket{background:transparent;border:0.5px solid var(--gold);color:var(--gold);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;padding:.45rem 1.2rem;border-radius:0;transition:all .25s;text-decoration:none;}
+.btn-ticket:hover{background:var(--gold);color:var(--black);}
+
+/* PAGE HEADER */
+.page-header{padding:9rem 0 4rem;position:relative;overflow:hidden;background:linear-gradient(to bottom,rgba(10,10,10,0.5),var(--black)),url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1600&q=80') center/cover;}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,9vw,7rem);letter-spacing:.06em;line-height:.88;}
+
+/* SUB NAV */
+.sub-nav{background:var(--deep);border-bottom:.5px solid var(--border);padding:0;position:sticky;top:65px;z-index:99;}
+.sub-nav a{display:inline-block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:1rem 1.4rem;text-decoration:none;border-bottom:2px solid transparent;transition:all .25s;}
+.sub-nav a:hover{color:var(--gold);}
+.sub-nav a.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* COUNTDOWN CARD */
+.coming-card{background:var(--panel);border:.5px solid var(--border);overflow:hidden;transition:all .35s;cursor:pointer;display:flex;flex-direction:column;}
+.coming-card:hover{border-color:var(--gold);transform:translateY(-4px);}
+.coming-poster{width:100%;aspect-ratio:16/9;object-fit:cover;filter:brightness(.7);transition:all .4s;}
+.coming-card:hover .coming-poster{filter:brightness(.5);}
+.coming-body{padding:1.4rem;}
+.coming-date-tag{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem;}
+.coming-date-tag::before{content:'';width:20px;height:.5px;background:var(--gold);}
+.coming-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.06em;line-height:1;margin-bottom:.5rem;}
+.coming-genre{font-size:.68rem;color:var(--muted);letter-spacing:.06em;margin-bottom:.8rem;}
+.coming-desc{font-size:.78rem;color:rgba(255,255,255,.6);line-height:1.7;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+
+/* COUNTDOWN TIMER */
+.countdown{display:flex;gap:1rem;margin:1rem 0;}
+.countdown-unit{text-align:center;}
+.countdown-num{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--gold);line-height:1;letter-spacing:.06em;}
+.countdown-lbl{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:.15rem;}
+
+/* REMIND BTN */
+.btn-remind{background:transparent;border:.5px solid var(--border);color:var(--gold);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;padding:.5rem 1rem;border-radius:0;cursor:pointer;transition:all .25s;font-family:'DM Sans',sans-serif;width:100%;margin-top:.8rem;}
+.btn-remind:hover,.btn-remind.active{background:var(--gold);border-color:var(--gold);color:var(--black);}
+
+/* TIMELINE VIEW */
+.timeline-item{display:flex;gap:1.5rem;padding:1.8rem 0;border-bottom:.5px solid rgba(255,255,255,.05);transition:padding-left .3s;}
+.timeline-item:hover{padding-left:.6rem;}
+.timeline-item:last-child{border-bottom:none;}
+.timeline-date{min-width:60px;text-align:center;}
+.tl-day{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold);line-height:1;}
+.tl-month{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+.timeline-poster{width:54px;height:80px;object-fit:cover;flex-shrink:0;filter:brightness(.8);}
+.timeline-info{flex:1;}
+.timeline-title{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:.05em;margin-bottom:.25rem;}
+.timeline-meta{font-size:.7rem;color:var(--muted);}
+.btn-remind-sm{margin-left:auto;background:transparent;border:.5px solid var(--border);color:var(--gold);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .8rem;border-radius:0;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;white-space:nowrap;align-self:center;flex-shrink:0;}
+.btn-remind-sm:hover,.btn-remind-sm.active{background:var(--gold);border-color:var(--gold);color:var(--black);}
+
+/* VIEW TOGGLE */
+.view-btn{background:transparent;border:.5px solid var(--border);color:var(--muted);padding:.4rem .75rem;border-radius:0;cursor:pointer;transition:all .2s;font-size:.75rem;}
+.view-btn.active,.view-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+.spinner{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:3rem auto;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* NOTIFY TOAST */
+.toast-box{position:fixed;bottom:2rem;right:2rem;background:var(--deep);border:.5px solid var(--gold);color:#fff;padding:.8rem 1.2rem;font-size:.78rem;z-index:9999;animation:toastIn .3s ease;}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+footer{background:var(--deep);border-top:.5px solid var(--border);padding:2.5rem 0;}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.15em;color:var(--gold);}
+.footer-link{font-size:.78rem;color:rgba(255,255,255,.45);text-decoration:none;margin-bottom:.4rem;display:block;transition:color .2s;}
+.footer-link:hover{color:var(--gold-light);}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <a href="index.html" class="nav-logo">VELVET<span>SCREEN</span></a>
+      <div class="d-none d-lg-flex align-items-center">
+        <a href="index.html" class="nav-link-item">Beranda</a>
+        <a href="now-showing.html" class="nav-link-item">Sedang Tayang</a>
+        <a href="coming-soon.html" class="nav-link-item active">Segera Hadir</a>
+        <a href="schedule.html" class="nav-link-item">Jadwal</a>
+        <a href="location.html" class="nav-link-item">Lokasi</a>
+      </div>
+      <a href="booking.html" class="btn-ticket">Beli Tiket</a>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <svg class="position-absolute d-none d-lg-block" width="200" height="200" viewBox="0 0 200 200" style="right:6%;top:50%;transform:translateY(-50%);opacity:.06;">
+    <circle cx="100" cy="100" r="90" fill="none" stroke="#C9A84C" stroke-width="1" stroke-dasharray="5 3"/>
+    <circle cx="100" cy="100" r="55" fill="none" stroke="#C9A84C" stroke-width=".5"/>
+    <line x1="10" y1="100" x2="190" y2="100" stroke="#C9A84C" stroke-width=".5" stroke-dasharray="4 4"/>
+    <line x1="100" y1="10" x2="100" y2="190" stroke="#C9A84C" stroke-width=".5" stroke-dasharray="4 4"/>
+  </svg>
+  <div class="container">
+    <p style="font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;display:flex;align-items:center;gap:.7rem;"><span style="width:28px;height:.5px;background:var(--gold);display:inline-block;"></span>Rilis Mendatang</p>
+    <h1 class="page-title">SEGERA<br><span style="color:var(--gold)">HADIR</span></h1>
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--muted);font-size:1.05rem;margin-top:.8rem;">Film-film yang akan segera tayang — tandai kalendermu</p>
+  </div>
+</div>
+
+<!-- SUB NAV -->
+<div class="sub-nav">
+  <div class="container">
+    <a href="now-showing.html">Sedang Tayang</a>
+    <a href="coming-soon.html" class="active">Segera Hadir</a>
+    <a href="schedule.html">Jadwal Lengkap</a>
+    <a href="movies.html">Semua Film</a>
+  </div>
+</div>
+
+<!-- TOOLBAR -->
+<div style="background:var(--deep);border-bottom:.5px solid rgba(255,255,255,.05);padding:.7rem 0;">
+  <div class="container d-flex align-items-center gap-2 flex-wrap">
+    <span style="font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);">Tampilan:</span>
+    <button class="view-btn active" id="btnGrid" onclick="setView('grid')"><i class="fa fa-th"></i></button>
+    <button class="view-btn" id="btnList" onclick="setView('list')"><i class="fa fa-list"></i></button>
+    <span style="font-size:.66rem;color:var(--muted);margin-left:1rem;" id="comingCount">Memuat...</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div style="padding:3rem 0 5rem;background:var(--black);">
+  <div class="container">
+    <div id="loader"><div class="spinner"></div></div>
+
+    <!-- GRID VIEW -->
+    <div class="row g-4" id="gridView"></div>
+
+    <!-- LIST VIEW (Timeline) -->
+    <div id="listView" style="display:none;max-width:700px;"></div>
+
+    <div id="emptyState" style="display:none;text-align:center;padding:4rem 0;">
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.1em;color:var(--muted);">TIDAK ADA DATA</p>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4"><div class="footer-logo mb-1">VELVETSCREEN</div><p style="font-size:.78rem;color:var(--muted);">Pengalaman bioskop terdepan di Indonesia.</p></div>
+      <div class="col-6 col-md-3">
+        <div style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;">Navigasi</div>
+        <a href="now-showing.html" class="footer-link">Sedang Tayang</a>
+        <a href="coming-soon.html" class="footer-link">Segera Hadir</a>
+        <a href="schedule.html" class="footer-link">Jadwal</a>
+        <a href="booking.html" class="footer-link">Pesan Tiket</a>
+        <a href="location.html" class="footer-link">Lokasi</a>
+      </div>
+    </div>
+    <div style="border-top:.5px solid rgba(255,255,255,.06);padding-top:1.5rem;margin-top:2rem;">
+      <div style="font-size:.7rem;color:var(--muted);">© 2026 VelvetScreen. Hak cipta dilindungi.</div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let viewMode = 'grid';
+let remindSet = new Set();
+
+function setView(v) {
+  viewMode = v;
+  document.getElementById('gridView').style.display = v === 'grid' ? '' : 'none';
+  document.getElementById('listView').style.display = v === 'list' ? '' : 'none';
+  document.getElementById('btnGrid').classList.toggle('active', v === 'grid');
+  document.getElementById('btnList').classList.toggle('active', v === 'list');
+}
+
+function countdown(dateStr) {
+  const parts = dateStr.split(' ');
+  const months = {Januari:0,Februari:1,Maret:2,April:3,Mei:4,Juni:5,Juli:6,Agustus:7,September:8,Oktober:9,November:10,Desember:11};
+  const target = new Date(parseInt(parts[2]), months[parts[1]] || 5, parseInt(parts[0]));
+  const now = new Date();
+  const diff = target - now;
+  if (diff <= 0) return null;
+  const days = Math.floor(diff/86400000);
+  const hours = Math.floor((diff%86400000)/3600000);
+  const mins = Math.floor((diff%3600000)/60000);
+  return {days, hours, mins};
+}
+
+function toggleRemind(id, btnEl) {
+  if (remindSet.has(id)) {
+    remindSet.delete(id);
+    btnEl.classList.remove('active');
+    btnEl.innerHTML = '<i class="fa fa-bell me-1"></i>Ingatkan Saya';
+    showToast('Pengingat dibatalkan.');
+  } else {
+    remindSet.add(id);
+    btnEl.classList.add('active');
+    btnEl.innerHTML = '<i class="fa fa-bell me-1"></i>Diingatkan ✦';
+    showToast('Kami akan mengingatkan kamu!');
+  }
+}
+
+function showToast(msg) {
+  const existing = document.querySelector('.toast-box');
+  if (existing) existing.remove();
+  const d = document.createElement('div');
+  d.className = 'toast-box';
+  d.innerHTML = `<i class="fa fa-check-circle me-2" style="color:var(--gold)"></i>${msg}`;
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 2800);
+}
+
+async function loadMovies() {
+  const res = await fetch('movies.json');
+  const movies = (await res.json()).filter(m => m.status === 'coming_soon');
+  document.getElementById('loader').style.display = 'none';
+  document.getElementById('comingCount').textContent = movies.length + ' film akan segera rilis';
+
+  if (!movies.length) { document.getElementById('emptyState').style.display = 'block'; return; }
+
+  // GRID VIEW
+  document.getElementById('gridView').innerHTML = movies.map((m, i) => {
+    const cd = m.release_date ? countdown(m.release_date) : null;
+    return `
+      <div class="col-md-6 col-lg-4 reveal" style="transition-delay:${i*0.08}s">
+        <div class="coming-card">
+          <img src="${m.poster}" class="coming-poster" alt="${m.title}">
+          <div class="coming-body">
+            <div class="coming-date-tag">${m.release_date || 'TBA'}</div>
+            <h3 class="coming-title">${m.title}</h3>
+            <div class="coming-genre">${m.genre} · ${m.duration} · ${m.age}</div>
+            <p class="coming-desc">${m.description}</p>
+            ${cd ? `
+            <div class="countdown mt-3">
+              <div class="countdown-unit"><div class="countdown-num">${cd.days}</div><div class="countdown-lbl">Hari</div></div>
+              <div class="countdown-unit"><div class="countdown-num">${cd.hours}</div><div class="countdown-lbl">Jam</div></div>
+              <div class="countdown-unit"><div class="countdown-num">${cd.mins}</div><div class="countdown-lbl">Menit</div></div>
+            </div>` : ''}
+            <button class="btn-remind" id="rem-${m.id}" onclick="toggleRemind(${m.id}, this)">
+              <i class="fa fa-bell me-1"></i>Ingatkan Saya
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // LIST (TIMELINE) VIEW
+  document.getElementById('listView').innerHTML = movies.map(m => {
+    const parts = m.release_date ? m.release_date.split(' ') : ['?','?','?'];
+    return `
+      <div class="timeline-item reveal">
+        <div class="timeline-date">
+          <div class="tl-day">${parts[0]}</div>
+          <div class="tl-month">${parts[1]?.slice(0,3) || '—'}</div>
+        </div>
+        <img src="${m.poster}" class="timeline-poster" alt="${m.title}">
+        <div class="timeline-info">
+          <div class="timeline-title">${m.title}</div>
+          <div class="timeline-meta">${m.genre} · ${m.duration} · ${m.age}</div>
+          <div style="font-size:.68rem;color:var(--muted);margin-top:.3rem;">${m.studios.join(' · ')}</div>
+        </div>
+        <button class="btn-remind-sm" id="reml-${m.id}" onclick="toggleRemind(${m.id}, this)">
+          <i class="fa fa-bell me-1"></i>Ingatkan
+        </button>
+      </div>
+    `;
+  }).join('');
+
+  setTimeout(() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible')), 50);
+}
+
+loadMovies();
+</script>
+</body>
+</html>

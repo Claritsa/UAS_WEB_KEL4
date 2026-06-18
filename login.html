@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Akun — VelvetScreen</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C9A84C;--black:#0A0A0A;--deep:#111014;--panel:#16141A;--border:rgba(201,168,76,0.2);--muted:rgba(255,255,255,0.45);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--black);color:#fff;font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+::-webkit-scrollbar{width:3px;} ::-webkit-scrollbar-thumb{background:var(--gold);}
+nav{background:rgba(10,10,10,.95);border-bottom:0.5px solid var(--border);}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.65rem;letter-spacing:.15em;color:var(--gold);text-decoration:none;}
+.container{padding:2rem 1rem;}
+.auth-card{background:var(--panel);border:0.5px solid var(--border);padding:2rem;border-radius:0;}
+.auth-title{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:.08em;margin-bottom:1rem;}
+.form-label{color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-size:.75rem;}
+.form-control{background:#16141A;border:0.5px solid var(--border);color:#fff;border-radius:0;}
+.form-control:focus{border-color:var(--gold);box-shadow:none;}
+.btn-gold{background:var(--gold);border:none;color:#111;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:.85rem 1.3rem;border-radius:0;}
+.btn-gold:hover{background:#E8C97A;}
+.toggle-link{color:var(--gold);cursor:pointer;text-decoration:underline;}
+.alert-box{background:rgba(201,168,76,.1);border:1px solid var(--gold);padding:1rem 1.2rem;margin-bottom:1.4rem;color:#fff;}
+.footer-note{color:var(--muted);font-size:.82rem;margin-top:1rem;}
+</style>
+</head>
+<body>
+<nav class="py-3">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="index.html" class="nav-logo">VELVET<span style="color:#fff;">SCREEN</span></a>
+    <a href="account.html" class="btn btn-gold">Akun</a>
+  </div>
+</nav>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="auth-card">
+        <div class="auth-title">Masuk ke Akun Anda</div>
+        <div id="messageBox" class="alert-box" style="display:none;"></div>
+
+        <form id="loginForm">
+          <div class="mb-3">
+            <label class="form-label" for="loginEmail">Email</label>
+            <input id="loginEmail" type="email" class="form-control" placeholder="email@contoh.com" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="loginPassword">Kata Sandi</label>
+            <input id="loginPassword" type="password" class="form-control" placeholder="Masukkan kata sandi" required>
+          </div>
+          <button type="submit" class="btn btn-gold w-100 mb-3">Masuk</button>
+        </form>
+
+        <div style="text-align:center;color:var(--muted);margin-bottom:1rem;">Belum punya akun?</div>
+
+        <form id="registerForm">
+          <div class="mb-3">
+            <label class="form-label" for="registerName">Nama</label>
+            <input id="registerName" type="text" class="form-control" placeholder="Nama lengkap" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="registerEmail">Email</label>
+            <input id="registerEmail" type="email" class="form-control" placeholder="email@contoh.com" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="registerPassword">Kata Sandi</label>
+            <input id="registerPassword" type="password" class="form-control" placeholder="Minimal 6 karakter" required>
+          </div>
+          <button type="submit" class="btn btn-gold w-100">Daftar & Masuk</button>
+        </form>
+        <p class="footer-note">Setelah berhasil masuk, riwayat pembelian tiket akan disimpan di akun Anda.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function getUsers() {
+  return JSON.parse(localStorage.getItem('vs_users') || '[]');
+}
+function saveUsers(users) {
+  localStorage.setItem('vs_users', JSON.stringify(users));
+}
+function getCurrentUser() {
+  return localStorage.getItem('vs_currentUser');
+}
+function setCurrentUser(email) {
+  localStorage.setItem('vs_currentUser', email);
+}
+function showMessage(message, type='success') {
+  const box = document.getElementById('messageBox');
+  box.textContent = message;
+  box.style.display = 'block';
+  box.style.borderColor = type === 'success' ? 'var(--gold)' : '#cc4444';
+  box.style.color = '#fff';
+  box.style.background = type === 'success' ? 'rgba(201,168,76,.1)' : 'rgba(204,68,68,.1)';
+  setTimeout(() => box.style.display = 'none', 4200);
+}
+function getReturnUrl() {
+  const params = new URLSearchParams(location.search);
+  return params.get('return') || 'account.html';
+}
+function redirectToAccount() {
+  location.href = getReturnUrl();
+}
+
+if (getCurrentUser()) {
+  redirectToAccount();
+}
+
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const password = document.getElementById('loginPassword').value;
+  const users = getUsers();
+  const user = users.find(u => u.email === email && u.password === password);
+  if (!user) {
+    showMessage('Email atau kata sandi salah.', 'error');
+    return;
+  }
+  setCurrentUser(user.email);
+  showMessage('Berhasil masuk! Mengalihkan...', 'success');
+  setTimeout(redirectToAccount, 900);
+});
+
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const name = document.getElementById('registerName').value.trim();
+  const email = document.getElementById('registerEmail').value.trim().toLowerCase();
+  const password = document.getElementById('registerPassword').value;
+  if (password.length < 6) {
+    showMessage('Kata sandi minimal 6 karakter.', 'error');
+    return;
+  }
+  const users = getUsers();
+  if (users.some(u => u.email === email)) {
+    showMessage('Email sudah terdaftar. Silakan login.', 'error');
+    return;
+  }
+  users.push({name, email, password, balance: 500000});
+  saveUsers(users);
+  setCurrentUser(email);
+  showMessage('Akun dibuat. Mengalihkan...', 'success');
+  setTimeout(redirectToAccount, 900);
+});
+</script>
+</body>
+</html>

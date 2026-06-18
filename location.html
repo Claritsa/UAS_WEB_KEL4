@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lokasi — VelvetScreen</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C9A84C;--gold-light:#E8C97A;--black:#0A0A0A;--deep:#111014;--panel:#16141A;--border:rgba(201,168,76,0.2);--muted:rgba(255,255,255,0.45);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--black);color:#fff;font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden;}
+::-webkit-scrollbar{width:3px;} ::-webkit-scrollbar-thumb{background:var(--gold);}
+#navbar{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.2rem 0;background:rgba(10,10,10,.92);backdrop-filter:blur(14px);border-bottom:.5px solid var(--border);}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:.15em;color:var(--gold)!important;text-decoration:none;}
+.nav-logo span{color:#fff;}
+.navbar-nav .nav-link{color:rgba(255,255,255,.65)!important;font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;transition:color .2s;}
+.navbar-nav .nav-link:hover,.navbar-nav .nav-link.active{color:var(--gold)!important;}
+.btn-ticket{background:transparent;border:.5px solid var(--gold);color:var(--gold);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;padding:.45rem 1.2rem;border-radius:0;transition:all .25s;text-decoration:none;}
+.btn-ticket:hover{background:var(--gold);color:var(--black);}
+.page-header{padding:8rem 0 3.5rem;background:linear-gradient(to bottom,rgba(10,10,10,.5),var(--black)),url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1600&q=80') center/cover;}
+.sec-eye{font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,5vw,4.5rem);letter-spacing:.06em;line-height:.9;}
+.divider-gold{width:38px;height:1px;background:var(--gold);margin:1rem 0 2rem;}
+
+/* Location cards */
+.loc-card{background:var(--panel);border:.5px solid var(--border);transition:border-color .3s,transform .3s;cursor:pointer;overflow:hidden;}
+.loc-card:hover{border-color:var(--gold);transform:translateY(-3px);}
+.loc-card.active{border-color:var(--gold);background:#1A1820;}
+.loc-img{width:100%;height:160px;object-fit:cover;filter:brightness(.75);transition:filter .3s;}
+.loc-card:hover .loc-img,.loc-card.active .loc-img{filter:brightness(.9);}
+.loc-body{padding:1.4rem;}
+.loc-name{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.08em;margin-bottom:.4rem;}
+.loc-addr{font-size:.75rem;color:var(--muted);line-height:1.6;margin-bottom:.8rem;}
+.loc-badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;border:.5px solid var(--border);color:var(--muted);padding:.22rem .65rem;margin:.15rem;}
+.loc-badge i{color:var(--gold);font-size:.6rem;}
+.loc-badge.gold{border-color:var(--gold);color:var(--gold);}
+
+/* Map */
+.map-frame{width:100%;height:420px;border:.5px solid var(--border);filter:grayscale(.3) invert(.08);transition:filter .3s;}
+.map-frame:hover{filter:grayscale(0) invert(0);}
+
+/* Info boxes */
+.info-box{background:var(--panel);border:.5px solid var(--border);padding:1.5rem;height:100%;}
+.info-title{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;}
+.info-row{display:flex;align-items:flex-start;gap:.8rem;padding:.55rem 0;border-bottom:.5px solid rgba(255,255,255,.05);font-size:.78rem;}
+.info-row:last-child{border-bottom:none;}
+.info-row i{color:var(--gold);width:14px;margin-top:.1rem;flex-shrink:0;font-size:.8rem;}
+.info-row span{color:rgba(255,255,255,.7);line-height:1.6;}
+
+/* SVG studio icons */
+.studio-feature{display:flex;align-items:center;gap:1rem;padding:.8rem 0;border-bottom:.5px solid rgba(255,255,255,.05);}
+.studio-feature:last-child{border-bottom:none;}
+.studio-feature svg{flex-shrink:0;}
+
+/* CTA */
+.btn-gold{background:var(--gold);border:none;color:var(--black);font-size:.75rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;padding:.85rem 2rem;border-radius:0;transition:all .25s;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;}
+.btn-gold:hover{background:var(--gold-light);color:var(--black);transform:translateY(-2px);}
+.btn-ghost{background:transparent;border:.5px solid rgba(255,255,255,.3);color:#fff;font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;padding:.85rem 2rem;border-radius:0;transition:all .25s;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+
+/* Reveal */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* Footer */
+footer{background:var(--deep);border-top:.5px solid var(--border);padding:3rem 0 2rem;}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.15em;color:var(--gold);}
+.footer-copy{font-size:.7rem;color:var(--muted);}
+.footer-link{display:block;font-size:.8rem;color:rgba(255,255,255,.45);text-decoration:none;margin-bottom:.5rem;transition:color .2s;}
+.footer-link:hover{color:var(--gold-light);}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <a href="index.html" class="nav-logo">VELVET<span>SCREEN</span></a>
+      <div class="d-none d-lg-flex">
+        <ul class="navbar-nav flex-row gap-1 mb-0">
+          <li><a class="nav-link px-3" href="index.html">Beranda</a></li>
+          <li><a class="nav-link px-3" href="movies.html">Film</a></li>
+          <li><a class="nav-link px-3" href="booking.html">Pesan Tiket</a></li>
+          <li><a class="nav-link active px-3" href="location.html">Lokasi</a></li>
+        </ul>
+      </div>
+      <a href="booking.html" class="btn-ticket">Beli Tiket</a>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header position-relative">
+  <!-- SVG Decoration (Materi Pertemuan 2 & 3) -->
+  <svg class="position-absolute d-none d-lg-block" width="180" height="180" viewBox="0 0 180 180" style="right:8%;top:50%;transform:translateY(-50%);opacity:.07;pointer-events:none;">
+    <circle cx="90" cy="90" r="80" fill="none" stroke="#C9A84C" stroke-width=".8" stroke-dasharray="5 3"/>
+    <circle cx="90" cy="90" r="50" fill="none" stroke="#C9A84C" stroke-width=".5"/>
+    <circle cx="90" cy="90" r="6" fill="#C9A84C" opacity=".5"/>
+    <line x1="90" y1="10" x2="90" y2="40" stroke="#C9A84C" stroke-width=".8"/>
+    <line x1="90" y1="140" x2="90" y2="170" stroke="#C9A84C" stroke-width=".8"/>
+    <line x1="10" y1="90" x2="40" y2="90" stroke="#C9A84C" stroke-width=".8"/>
+    <line x1="140" y1="90" x2="170" y2="90" stroke="#C9A84C" stroke-width=".8"/>
+  </svg>
+  <div class="container">
+    <p class="sec-eye">Temukan Kami</p>
+    <h1 class="sec-title">LOKASI<br><span style="color:var(--gold)">BIOSKOP</span></h1>
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--muted);font-size:1.05rem;margin-top:.8rem;">Hadir di kota-kota besar Indonesia</p>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<section style="padding:3rem 0 5rem;background:var(--black);">
+  <div class="container">
+
+    <!-- Location Cards (Bootstrap Grid) -->
+    <div class="row g-3 mb-5">
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="loc-card active" onclick="switchMap(this,'jakarta-selatan')" id="card-jaksel">
+          <img src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=400&q=80" class="loc-img" alt="Jakarta Selatan">
+          <div class="loc-body">
+            <div class="loc-name">JAKARTA SELATAN</div>
+            <div class="loc-addr"><i class="fa fa-map-marker-alt me-1" style="color:var(--gold)"></i> Grand Indonesia, Jl. MH Thamrin, Jakarta Pusat 10310</div>
+            <div>
+              <span class="loc-badge gold"><i class="fa fa-star"></i> Flagship</span>
+              <span class="loc-badge"><i class="fa fa-expand"></i> IMAX</span>
+              <span class="loc-badge"><i class="fa fa-wind"></i> 4DX</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="loc-card" onclick="switchMap(this,'jakarta-barat')" id="card-jakbar">
+          <img src="https://images.unsplash.com/photo-1470219556762-1771e7f9427d?w=400&q=80" class="loc-img" alt="Jakarta Barat">
+          <div class="loc-body">
+            <div class="loc-name">JAKARTA BARAT</div>
+            <div class="loc-addr"><i class="fa fa-map-marker-alt me-1" style="color:var(--gold)"></i> Central Park Mall, Jl. Letjen S. Parman, Jakarta Barat 11470</div>
+            <div>
+              <span class="loc-badge"><i class="fa fa-star"></i> Gold Class</span>
+              <span class="loc-badge"><i class="fa fa-film"></i> Reguler</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="loc-card" onclick="switchMap(this,'surabaya')" id="card-sby">
+          <img src="https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=400&q=80" class="loc-img" alt="Surabaya">
+          <div class="loc-body">
+            <div class="loc-name">SURABAYA</div>
+            <div class="loc-addr"><i class="fa fa-map-marker-alt me-1" style="color:var(--gold)"></i> Tunjungan Plaza 6, Jl. Tunjungan No.1, Surabaya 60275</div>
+            <div>
+              <span class="loc-badge"><i class="fa fa-expand"></i> IMAX</span>
+              <span class="loc-badge"><i class="fa fa-wind"></i> 4DX</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="loc-card" onclick="switchMap(this,'bandung')" id="card-bdg">
+          <img src="https://images.unsplash.com/photo-1555399096-7a0be7b6c30d?w=400&q=80" class="loc-img" alt="Bandung">
+          <div class="loc-body">
+            <div class="loc-name">BANDUNG</div>
+            <div class="loc-addr"><i class="fa fa-map-marker-alt me-1" style="color:var(--gold)"></i> Paris Van Java Mall, Jl. Sukajadi No.137, Bandung 40162</div>
+            <div>
+              <span class="loc-badge"><i class="fa fa-star"></i> Gold Class</span>
+              <span class="loc-badge"><i class="fa fa-film"></i> Reguler</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAP + INFO Row -->
+    <div class="row g-4">
+      <!-- Google Maps (Materi Pertemuan 5: HTML Grafis Google Maps) -->
+      <div class="col-lg-8 reveal">
+        <p class="sec-eye mb-2">Peta Lokasi</p>
+        <div id="mapContainer">
+          <iframe id="mapFrame" class="map-frame"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.4!2d106.8227!3d-6.1944!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f5d2e764b12d%3A0x3d2ad6e1e0e9bcc8!2sGrand%20Indonesia!5e0!3m2!1sid!2sid!4v1"
+            allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="border:none;">
+          </iframe>
+        </div>
+
+        <!-- SVG Decorative Map Pin (Materi Pertemuan 2) -->
+        <div class="d-flex align-items-center gap-2 mt-2" style="font-size:.68rem;color:var(--muted);">
+          <svg width="14" height="14" viewBox="0 0 14 14">
+            <circle cx="7" cy="7" r="5" fill="none" stroke="#C9A84C" stroke-width="1"/>
+            <circle cx="7" cy="7" r="2" fill="#C9A84C"/>
+          </svg>
+          <span id="mapLabel">Grand Indonesia, Jakarta Pusat</span>
+        </div>
+      </div>
+
+      <!-- Info Panel -->
+      <div class="col-lg-4 reveal">
+        <p class="sec-eye mb-2">Informasi</p>
+
+        <!-- Jam Operasional -->
+        <div class="info-box mb-3">
+          <div class="info-title"><i class="fa fa-clock me-2"></i>Jam Operasional</div>
+          <div class="info-row">
+            <i class="fa fa-sun"></i>
+            <span><strong style="color:#fff">Senin – Jumat</strong><br>10.00 – 23.00 WIB</span>
+          </div>
+          <div class="info-row">
+            <i class="fa fa-moon"></i>
+            <span><strong style="color:#fff">Sabtu – Minggu</strong><br>09.00 – 24.00 WIB</span>
+          </div>
+          <div class="info-row">
+            <i class="fa fa-calendar-alt"></i>
+            <span><strong style="color:#fff">Hari Libur Nasional</strong><br>09.00 – 24.00 WIB</span>
+          </div>
+        </div>
+
+        <!-- Fasilitas -->
+        <div class="info-box mb-3">
+          <div class="info-title"><i class="fa fa-building me-2"></i>Fasilitas</div>
+          <!-- SVG Studio Icons (Materi Pertemuan 2 & 4) -->
+          <div class="studio-feature">
+            <svg width="28" height="28" viewBox="0 0 28 28">
+              <rect x="2" y="2" width="24" height="24" rx="2" fill="none" stroke="#C9A84C" stroke-width="1"/>
+              <rect x="6" y="6" width="16" height="16" rx="1" fill="rgba(201,168,76,.15)"/>
+              <circle cx="14" cy="14" r="4" fill="none" stroke="#C9A84C" stroke-width=".8"/>
+            </svg>
+            <span style="font-size:.78rem;color:rgba(255,255,255,.7);">Layar IMAX 270° Lengkung</span>
+          </div>
+          <div class="studio-feature">
+            <svg width="28" height="28" viewBox="0 0 28 28">
+              <circle cx="14" cy="14" r="11" fill="none" stroke="#C9A84C" stroke-width="1"/>
+              <path d="M9,14 L14,9 L19,14 L14,22 Z" fill="rgba(201,168,76,.2)" stroke="#C9A84C" stroke-width=".8"/>
+            </svg>
+            <span style="font-size:.78rem;color:rgba(255,255,255,.7);">Gold Class Recliner Lounge</span>
+          </div>
+          <div class="studio-feature">
+            <svg width="28" height="28" viewBox="0 0 28 28">
+              <path d="M4,14 Q14,4 24,14 Q14,24 4,14Z" fill="none" stroke="#C9A84C" stroke-width="1"/>
+              <circle cx="14" cy="14" r="3" fill="#C9A84C" opacity=".6"/>
+            </svg>
+            <span style="font-size:.78rem;color:rgba(255,255,255,.7);">4DX Motion & Effects</span>
+          </div>
+          <div class="studio-feature">
+            <svg width="28" height="28" viewBox="0 0 28 28">
+              <rect x="5" y="8" width="18" height="12" rx="1" fill="none" stroke="#C9A84C" stroke-width="1"/>
+              <line x1="14" y1="20" x2="14" y2="24" stroke="#C9A84C" stroke-width="1"/>
+              <line x1="10" y1="24" x2="18" y2="24" stroke="#C9A84C" stroke-width="1"/>
+            </svg>
+            <span style="font-size:.78rem;color:rgba(255,255,255,.7);">Parking & Food Court</span>
+          </div>
+        </div>
+
+        <!-- Kontak -->
+        <div class="info-box">
+          <div class="info-title"><i class="fa fa-phone me-2"></i>Kontak</div>
+          <div class="info-row"><i class="fa fa-phone-alt"></i><span>(021) 2358-1000</span></div>
+          <div class="info-row"><i class="fa fa-envelope"></i><span>info@velvetscreen.id</span></div>
+          <div class="info-row"><i class="fab fa-whatsapp"></i><span>+62 812-0000-1234</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="mt-5 pt-4 reveal" style="border-top:.5px solid var(--border);">
+      <div class="row align-items-center g-3">
+        <div class="col-md-6">
+          <p class="sec-eye">Siap Menonton?</p>
+          <h2 class="sec-title" style="font-size:2.5rem;">PESAN TIKET<br><span style="color:var(--gold)">SEKARANG</span></h2>
+          <div class="divider-gold"></div>
+          <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.05rem;color:var(--muted);">
+            Nikmati pengalaman sinema terbaik di Indonesia.
+          </p>
+        </div>
+        <div class="col-md-6 d-flex gap-3 flex-wrap">
+          <a href="booking.html" class="btn-gold"><i class="fa fa-ticket-alt me-1"></i> Pesan Tiket</a>
+          <a href="movies.html" class="btn-ghost"><i class="fa fa-film me-1"></i> Lihat Film</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="footer-logo">VELVETSCREEN</div>
+        <svg width="50" height="4" viewBox="0 0 50 4" style="margin:.5rem 0 1rem;">
+          <line x1="0" y1="2" x2="42" y2="2" stroke="#C9A84C" stroke-width=".5"/>
+          <circle cx="47" cy="2" r="2" fill="#C9A84C"/>
+        </svg>
+        <p style="font-size:.78rem;color:var(--muted);line-height:1.8;max-width:260px;">Pengalaman bioskop premium di Indonesia.</p>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;">Navigasi</div>
+        <a href="index.html" class="footer-link">Beranda</a>
+        <a href="movies.html" class="footer-link">Film</a>
+        <a href="booking.html" class="footer-link">Pesan Tiket</a>
+        <a href="location.html" class="footer-link">Lokasi</a>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;">Kota</div>
+        <a href="#" class="footer-link" onclick="switchMapById('jakarta-selatan');return false;">Jakarta Selatan</a>
+        <a href="#" class="footer-link" onclick="switchMapById('jakarta-barat');return false;">Jakarta Barat</a>
+        <a href="#" class="footer-link" onclick="switchMapById('surabaya');return false;">Surabaya</a>
+        <a href="#" class="footer-link" onclick="switchMapById('bandung');return false;">Bandung</a>
+      </div>
+    </div>
+    <div style="border-top:.5px solid rgba(255,255,255,.06);padding-top:1.5rem;margin-top:2.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+      <div class="footer-copy">© 2026 VelvetScreen. Hak cipta dilindungi.</div>
+      <div class="d-flex gap-2">
+        <a href="#" style="width:30px;height:30px;border:.5px solid var(--border);display:inline-flex;align-items:center;justify-content:center;color:var(--muted);text-decoration:none;transition:all .2s;font-size:.8rem;" onmouseover="this.style.color='var(--gold)';this.style.borderColor='var(--gold)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'"><i class="fab fa-instagram"></i></a>
+        <a href="#" style="width:30px;height:30px;border:.5px solid var(--border);display:inline-flex;align-items:center;justify-content:center;color:var(--muted);text-decoration:none;transition:all .2s;font-size:.8rem;" onmouseover="this.style.color='var(--gold)';this.style.borderColor='var(--gold)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'"><i class="fab fa-youtube"></i></a>
+        <a href="#" style="width:30px;height:30px;border:.5px solid var(--border);display:inline-flex;align-items:center;justify-content:center;color:var(--muted);text-decoration:none;transition:all .2s;font-size:.8rem;" onmouseover="this.style.color='var(--gold)';this.style.borderColor='var(--gold)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'"><i class="fab fa-tiktok"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Google Maps URLs per lokasi (Materi Pertemuan 5)
+const mapData = {
+  'jakarta-selatan': {
+    url: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.521260322283!2d106.81694491476907!3d-6.194741395514314!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f5d2e764b12d%3A0x3d2ad6e1e0e9bcc8!2sGrand%20Indonesia!5e0!3m2!1sid!2sid!4v1',
+    label: 'Grand Indonesia, Jakarta Pusat', cardId: 'card-jaksel'
+  },
+  'jakarta-barat': {
+    url: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.9!2d106.7917!3d-6.1771!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f6b8e73b3d45%3A0x1f3a4d2b5e6c7a8b!2sCentral%20Park%20Mall!5e0!3m2!1sid!2sid!4v1',
+    label: 'Central Park Mall, Jakarta Barat', cardId: 'card-jakbar'
+  },
+  'surabaya': {
+    url: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.6!2d112.7378!3d-7.2575!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7fbf8381ac47f%3A0x17800000000000!2sTunjungan%20Plaza%206!5e0!3m2!1sid!2sid!4v1',
+    label: 'Tunjungan Plaza 6, Surabaya', cardId: 'card-sby'
+  },
+  'bandung': {
+    url: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.9!2d107.5996!3d-6.8973!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68e63b6d3b2b7f%3A0x7b5e8f2d3c4a1b!2sParis%20Van%20Java%20Mall!5e0!3m2!1sid!2sid!4v1',
+    label: 'Paris Van Java Mall, Bandung', cardId: 'card-bdg'
+  }
+};
+
+function switchMap(cardEl, key) {
+  document.querySelectorAll('.loc-card').forEach(c => c.classList.remove('active'));
+  cardEl.classList.add('active');
+  const d = mapData[key];
+  document.getElementById('mapFrame').src = d.url;
+  document.getElementById('mapLabel').textContent = d.label;
+}
+
+function switchMapById(key) {
+  const d = mapData[key];
+  if (!d) return;
+  document.querySelectorAll('.loc-card').forEach(c => c.classList.remove('active'));
+  document.getElementById(d.cardId).classList.add('active');
+  document.getElementById('mapFrame').src = d.url;
+  document.getElementById('mapLabel').textContent = d.label;
+  document.getElementById('mapFrame').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+// Scroll reveal
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); }});
+}, {threshold:.1});
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

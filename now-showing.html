@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sedang Tayang — VelvetScreen</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C9A84C;--gold-light:#E8C97A;--black:#0A0A0A;--deep:#111014;--panel:#16141A;--border:rgba(201,168,76,0.2);--muted:rgba(255,255,255,0.45);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--black);color:#fff;font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden;}
+::-webkit-scrollbar{width:3px;} ::-webkit-scrollbar-thumb{background:var(--gold);}
+
+/* NAVBAR */
+#navbar{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.2rem 0;background:rgba(10,10,10,0.95);backdrop-filter:blur(14px);border-bottom:0.5px solid var(--border);}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:.15em;color:var(--gold)!important;text-decoration:none;}
+.nav-logo span{color:#fff;}
+.nav-link-item{color:rgba(255,255,255,0.65);font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;padding:.4rem .9rem;transition:color .2s;display:inline-block;}
+.nav-link-item:hover,.nav-link-item.active{color:var(--gold);}
+.btn-ticket{background:transparent;border:0.5px solid var(--gold);color:var(--gold);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;padding:.45rem 1.2rem;border-radius:0;transition:all .25s;text-decoration:none;}
+.btn-ticket:hover{background:var(--gold);color:var(--black);}
+
+/* PAGE HEADER */
+.page-header{padding:9rem 0 4rem;position:relative;overflow:hidden;background:linear-gradient(to bottom,rgba(10,10,10,0.4),var(--black)),url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1600&q=80') center/cover;}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,9vw,7rem);letter-spacing:.06em;line-height:.88;}
+
+/* SUB NAV (halaman-halaman film) */
+.sub-nav{background:var(--deep);border-bottom:.5px solid var(--border);padding:0;position:sticky;top:65px;z-index:99;}
+.sub-nav a{display:inline-block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:1rem 1.4rem;text-decoration:none;border-bottom:2px solid transparent;transition:all .25s;}
+.sub-nav a:hover{color:var(--gold);}
+.sub-nav a.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* SORT BAR */
+.sort-bar{padding:.8rem 0;border-bottom:.5px solid rgba(255,255,255,.05);}
+.sort-btn{background:transparent;border:.5px solid var(--border);color:var(--muted);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .8rem;border-radius:0;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.sort-btn:hover,.sort-btn.active{border-color:var(--gold);color:var(--gold);}
+.search-wrap{position:relative;max-width:200px;}
+.search-wrap input{background:var(--panel);border:.5px solid var(--border);color:#fff;font-size:.75rem;padding:.45rem .8rem .45rem 2.2rem;border-radius:0;width:100%;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
+.search-wrap input:focus{border-color:var(--gold);}
+.search-wrap input::placeholder{color:var(--muted);}
+.search-wrap i{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.75rem;}
+
+/* MOVIE CARD */
+.movie-card{position:relative;overflow:hidden;cursor:pointer;perspective:900px;}
+.card-inner{position:relative;transition:transform .5s cubic-bezier(.23,1,.32,1);transform-style:preserve-3d;}
+.movie-card:hover .card-inner{transform:rotateY(-5deg) rotateX(2deg) scale(1.03);}
+.movie-poster{width:100%;aspect-ratio:2/3;object-fit:cover;filter:brightness(.88);transition:filter .4s;display:block;}
+.movie-card:hover .movie-poster{filter:brightness(.55);}
+.card-base{position:absolute;bottom:0;left:0;right:0;padding:1.1rem;background:linear-gradient(to top,rgba(10,10,10,.96) 0%,transparent);}
+.movie-genre-label{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:.3rem;}
+.movie-name{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.05em;line-height:1.05;}
+.card-hover{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:1.2rem;background:linear-gradient(to top,rgba(10,10,10,.98) 30%,rgba(10,10,10,.35) 70%,transparent);opacity:0;transition:opacity .35s;}
+.movie-card:hover .card-hover{opacity:1;}
+.tag-rating{background:var(--gold);color:var(--black);font-size:.66rem;padding:.22rem .5rem;font-weight:500;display:inline-block;}
+.movie-desc{font-size:.7rem;color:rgba(255,255,255,.65);line-height:1.65;margin-bottom:.9rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.btn-book{background:var(--gold);border:none;color:var(--black);font-size:.68rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:.5rem 0;width:100%;border-radius:0;transition:background .2s;cursor:pointer;display:block;text-align:center;text-decoration:none;}
+.btn-book:hover{background:var(--gold-light);color:var(--black);}
+
+/* SPINNER */
+.spinner{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:3rem auto;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* COUNT BADGE */
+.count-badge{font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--gold);letter-spacing:.06em;line-height:1;}
+
+/* FOOTER */
+footer{background:var(--deep);border-top:.5px solid var(--border);padding:2.5rem 0;}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.15em;color:var(--gold);}
+.footer-link{font-size:.78rem;color:rgba(255,255,255,.45);text-decoration:none;margin-bottom:.4rem;display:block;transition:color .2s;}
+.footer-link:hover{color:var(--gold-light);}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <a href="index.html" class="nav-logo">VELVET<span>SCREEN</span></a>
+      <div class="d-none d-lg-flex align-items-center gap-0">
+        <a href="index.html" class="nav-link-item">Beranda</a>
+        <a href="now-showing.html" class="nav-link-item active">Sedang Tayang</a>
+        <a href="coming-soon.html" class="nav-link-item">Segera Hadir</a>
+        <a href="schedule.html" class="nav-link-item">Jadwal</a>
+        <a href="location.html" class="nav-link-item">Lokasi</a>
+      </div>
+      <a href="booking.html" class="btn-ticket">Beli Tiket</a>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <!-- SVG Decoration -->
+  <svg class="position-absolute d-none d-lg-block" width="220" height="220" viewBox="0 0 220 220" style="right:6%;top:50%;transform:translateY(-50%);opacity:.06;">
+    <circle cx="110" cy="110" r="100" fill="none" stroke="#C9A84C" stroke-width="1" stroke-dasharray="6 3"/>
+    <circle cx="110" cy="110" r="65" fill="none" stroke="#C9A84C" stroke-width=".5"/>
+    <polygon points="110,15 205,190 15,190" fill="none" stroke="#C9A84C" stroke-width=".5"/>
+  </svg>
+  <div class="container">
+    <p style="font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;display:flex;align-items:center;gap:.7rem;">
+      <span style="width:28px;height:.5px;background:var(--gold);display:inline-block;"></span>Film Bioskop
+    </p>
+    <h1 class="page-title">SEDANG<br><span style="color:var(--gold)">TAYANG</span></h1>
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--muted);font-size:1.05rem;margin-top:.8rem;">Film-film pilihan yang sedang diputar di bioskop kami</p>
+  </div>
+</div>
+
+<!-- SUB NAV -->
+<div class="sub-nav">
+  <div class="container">
+    <a href="now-showing.html" class="active">Sedang Tayang</a>
+    <a href="coming-soon.html">Segera Hadir</a>
+    <a href="schedule.html">Jadwal Lengkap</a>
+    <a href="movies.html">Semua Film</a>
+  </div>
+</div>
+
+<!-- SORT + SEARCH -->
+<div class="sort-bar" style="background:var(--black);">
+  <div class="container d-flex align-items-center flex-wrap gap-2">
+    <span style="font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:.5rem;">Urutkan:</span>
+    <button class="sort-btn active" data-sort="default">Terpopuler</button>
+    <button class="sort-btn" data-sort="rating">Rating</button>
+    <button class="sort-btn" data-sort="title">A–Z</button>
+    <button class="sort-btn" data-sort="price">Harga</button>
+    <div class="ms-auto search-wrap">
+      <i class="fa fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Cari film...">
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div style="padding:3rem 0 5rem;background:var(--black);">
+  <div class="container">
+    <div class="d-flex align-items-end gap-3 mb-4">
+      <div id="filmCount" class="count-badge">0</div>
+      <div style="font-size:.72rem;color:var(--muted);padding-bottom:.5rem;letter-spacing:.06em;">film sedang<br>diputar</div>
+    </div>
+
+    <div id="loader"><div class="spinner"></div></div>
+    <div class="row g-3" id="moviesGrid"></div>
+    <div id="emptyState" style="display:none;text-align:center;padding:4rem 0;">
+      <svg width="70" height="70" viewBox="0 0 70 70" style="opacity:.25;margin-bottom:1.2rem;">
+        <circle cx="35" cy="35" r="30" fill="none" stroke="#C9A84C" stroke-width="1.5"/>
+        <path d="M20,35 Q35,18 50,35 Q35,52 20,35Z" fill="none" stroke="#C9A84C" stroke-width="1"/>
+      </svg>
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.1em;color:var(--muted);">TIDAK ADA FILM</p>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-lg-4">
+        <div class="footer-logo mb-1">VELVETSCREEN</div>
+        <p style="font-size:.78rem;color:var(--muted);line-height:1.8;">Pengalaman bioskop terdepan di Indonesia.</p>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;">Navigasi</div>
+        <a href="now-showing.html" class="footer-link">Sedang Tayang</a>
+        <a href="coming-soon.html" class="footer-link">Segera Hadir</a>
+        <a href="schedule.html" class="footer-link">Jadwal</a>
+        <a href="booking.html" class="footer-link">Pesan Tiket</a>
+        <a href="location.html" class="footer-link">Lokasi</a>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;">Studio</div>
+        <a href="#" class="footer-link">IMAX Dome</a>
+        <a href="#" class="footer-link">Gold Class</a>
+        <a href="#" class="footer-link">4DX Motion</a>
+        <a href="#" class="footer-link">Reguler</a>
+      </div>
+    </div>
+    <div style="border-top:.5px solid rgba(255,255,255,.06);padding-top:1.5rem;margin-top:2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+      <div style="font-size:.7rem;color:var(--muted);">© 2026 VelvetScreen. Hak cipta dilindungi.</div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let allMovies = [];
+let sortMode = 'default';
+let searchTerm = '';
+
+async function loadMovies() {
+  const res = await fetch('movies.json');
+  allMovies = (await res.json()).filter(m => m.status === 'now_showing');
+  document.getElementById('loader').style.display = 'none';
+  renderMovies(allMovies);
+}
+
+function sortAndFilter() {
+  let list = [...allMovies];
+  if (searchTerm) list = list.filter(m => m.title.toLowerCase().includes(searchTerm) || m.genre.toLowerCase().includes(searchTerm));
+  if (sortMode === 'rating') list.sort((a,b) => parseFloat(b.rating)-parseFloat(a.rating));
+  else if (sortMode === 'title') list.sort((a,b) => a.title.localeCompare(b.title));
+  else if (sortMode === 'price') list.sort((a,b) => a.price-b.price);
+  renderMovies(list);
+}
+
+function renderMovies(list) {
+  document.getElementById('filmCount').textContent = list.length;
+  const grid = document.getElementById('moviesGrid');
+  const empty = document.getElementById('emptyState');
+  if (!list.length) { grid.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = list.map((m,i) => `
+    <div class="col-6 col-md-4 col-lg-3 reveal" style="transition-delay:${i*0.04}s">
+      <div class="movie-card">
+        <div class="card-inner">
+          <img src="${m.poster}" alt="${m.title}" class="movie-poster" loading="lazy">
+          <div class="card-base">
+            <div class="movie-genre-label">${m.genre}</div>
+            <div class="movie-name">${m.title}</div>
+          </div>
+          <div class="card-hover">
+            <p class="movie-desc">${m.description}</p>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="tag-rating">IMDb ${m.rating}</span>
+              <span style="font-size:.65rem;color:var(--muted)">${m.duration} · ${m.age}</span>
+            </div>
+            <div style="font-size:.68rem;color:var(--gold);margin-bottom:.7rem;">Mulai Rp ${m.price.toLocaleString('id-ID')}</div>
+            <a href="booking.html?id=${m.id}" class="btn-book"><i class="fa fa-ticket me-1"></i>Pesan Tiket</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  setTimeout(() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible')), 50);
+}
+
+document.querySelectorAll('.sort-btn').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    sortMode = btn.dataset.sort;
+    sortAndFilter();
+  };
+});
+
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchTerm = e.target.value.trim().toLowerCase();
+  sortAndFilter();
+});
+
+loadMovies();
+</script>
+</body>
+</html>

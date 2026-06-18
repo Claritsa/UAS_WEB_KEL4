@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VelvetScreen — Cinema</title>
+<!-- Bootstrap 12-14 (Materi Pertemuan 12-14) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Font Awesome Icons (Materi Pertemuan 4: HTML Grafis Icons) -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════
+   CSS VARIABLES
+═══════════════════════════════════ */
+:root {
+  --gold: #C9A84C;
+  --gold-light: #E8C97A;
+  --black: #0A0A0A;
+  --deep: #111014;
+  --panel: #16141A;
+  --border: rgba(201,168,76,0.2);
+  --muted: rgba(255,255,255,0.45);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--black); color: #fff; font-family: 'DM Sans', sans-serif; font-weight: 300; overflow-x: hidden; }
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: var(--gold); }
+
+/* ═══════════════════════════════════
+   NAVBAR (Bootstrap + custom)
+═══════════════════════════════════ */
+#navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  padding: 1.4rem 0;
+  transition: all 0.4s ease;
+}
+#navbar.scrolled {
+  background: rgba(10,10,10,0.95);
+  backdrop-filter: blur(14px);
+  border-bottom: 0.5px solid var(--border);
+  padding: 0.9rem 0;
+}
+.nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.75rem; letter-spacing: 0.15em; color: var(--gold) !important; text-decoration: none; }
+.nav-logo span { color: #fff; }
+.navbar-nav .nav-link { color: rgba(255,255,255,0.65) !important; font-size: 0.76rem; letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.2s; }
+.navbar-nav .nav-link:hover, .navbar-nav .nav-link.active { color: var(--gold) !important; }
+.btn-ticket { background: transparent; border: 0.5px solid var(--gold); color: var(--gold); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.5rem 1.3rem; border-radius: 0; transition: all 0.25s; }
+.btn-ticket:hover { background: var(--gold); color: var(--black); }
+
+/* ═══════════════════════════════════
+   HERO
+═══════════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, rgba(10,10,10,0.25) 0%, rgba(10,10,10,0.65) 55%, var(--black) 100%),
+              url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1600&q=80') center/cover no-repeat;
+  display: flex; align-items: flex-end; padding-bottom: 6rem; position: relative;
+}
+.hero-badge { font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.2rem; }
+.hero-badge::before { content: ''; width: 32px; height: 0.5px; background: var(--gold); }
+.hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4rem, 10vw, 9rem); line-height: 0.88; letter-spacing: 0.06em; margin-bottom: 1.4rem; }
+.hero-meta { display: flex; align-items: center; gap: 1.2rem; font-size: 0.76rem; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 2rem; flex-wrap: wrap; }
+.tag-rating { background: var(--gold); color: var(--black); font-size: 0.68rem; padding: 0.25rem 0.55rem; font-weight: 500; }
+.dot { width: 3px; height: 3px; background: var(--gold); border-radius: 50%; }
+.btn-gold { background: var(--gold); border: none; color: var(--black); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; padding: 0.85rem 2rem; border-radius: 0; transition: all 0.25s; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; }
+.btn-gold:hover { background: var(--gold-light); color: var(--black); transform: translateY(-2px); }
+.btn-ghost { background: transparent; border: 0.5px solid rgba(255,255,255,0.35); color: #fff; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; padding: 0.85rem 2rem; border-radius: 0; transition: all 0.25s; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; }
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+/* Scroll indicator */
+.scroll-cue { position: absolute; right: 2.5rem; bottom: 2.5rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.scroll-cue span { font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); writing-mode: vertical-rl; }
+.scroll-line { width: 0.5px; height: 44px; background: linear-gradient(to bottom, var(--gold), transparent); animation: pulseScroll 1.8s ease-in-out infinite; }
+@keyframes pulseScroll { 0%,100%{opacity:.25} 50%{opacity:1} }
+
+/* ═══════════════════════════════════
+   CSS3 TICKER ANIMATION (Materi Pertemuan 6)
+═══════════════════════════════════ */
+.ticker-bar { background: var(--gold); overflow: hidden; padding: 0.6rem 0; }
+.ticker-track { display: flex; gap: 0; white-space: nowrap; animation: tickerMove 30s linear infinite; }
+/* CSS3 Animation */
+@keyframes tickerMove { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+.ticker-item { display: inline-flex; align-items: center; gap: 2.5rem; font-family: 'Bebas Neue', sans-serif; font-size: 0.9rem; letter-spacing: 0.18em; color: var(--black); padding: 0 2rem; }
+.ticker-item::before { content: '✦'; font-size: 0.55rem; }
+
+/* ═══════════════════════════════════
+   SECTIONS
+═══════════════════════════════════ */
+section { padding: 5.5rem 0; }
+.sec-eye { font-size: 0.66rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.5rem; }
+.sec-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: 0.06em; line-height: 0.9; }
+.divider-gold { width: 38px; height: 1px; background: var(--gold); margin: 1rem 0 2.5rem; }
+
+/* ═══════════════════════════════════
+   MOVIE CARDS — CSS3 3D Hover (Materi Pertemuan 6)
+═══════════════════════════════════ */
+.movie-card { position: relative; overflow: hidden; cursor: pointer; perspective: 800px; }
+.movie-card-inner { position: relative; transition: transform 0.5s cubic-bezier(.23,1,.32,1); transform-style: preserve-3d; }
+/* CSS3 3D Transform on hover */
+.movie-card:hover .movie-card-inner { transform: rotateY(-4deg) rotateX(2deg) scale(1.02); }
+.movie-poster { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; filter: brightness(0.88); transition: filter 0.4s; }
+.movie-card:hover .movie-poster { filter: brightness(0.6); }
+.movie-base { position: absolute; bottom: 0; left: 0; right: 0; padding: 1.1rem; background: linear-gradient(to top, rgba(10,10,10,0.95) 0%, transparent 100%); }
+.movie-genre { font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.3rem; }
+.movie-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem; letter-spacing: 0.05em; line-height: 1.05; }
+.movie-hover { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 1.2rem; background: linear-gradient(to top, rgba(10,10,10,0.98) 30%, rgba(10,10,10,0.4) 70%, transparent); opacity: 0; transition: opacity 0.35s ease; }
+.movie-card:hover .movie-hover { opacity: 1; }
+.movie-desc { font-size: 0.72rem; color: rgba(255,255,255,0.68); line-height: 1.65; margin-bottom: 0.9rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.btn-book { background: var(--gold); border: none; color: var(--black); font-size: 0.68rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.5rem 0; width: 100%; border-radius: 0; transition: background 0.2s; cursor: pointer; }
+.btn-book:hover { background: var(--gold-light); }
+
+/* ═══════════════════════════════════
+   SVG WAVE DIVIDER (Materi Pertemuan 2 & 3: HTML Grafis SVG)
+═══════════════════════════════════ */
+.svg-divider { display: block; overflow: hidden; line-height: 0; }
+.svg-divider svg { display: block; }
+
+/* ═══════════════════════════════════
+   FEATURED STRIP
+═══════════════════════════════════ */
+.featured-section { background: var(--deep); position: relative; }
+.featured-img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; }
+.featured-badge { background: var(--gold); color: var(--black); font-size: 0.6rem; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; padding: 0.3rem 0.75rem; display: inline-block; margin-bottom: 1.2rem; }
+.featured-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.8rem, 6vw, 5rem); line-height: 0.9; margin-bottom: 1rem; }
+.featured-desc { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: rgba(255,255,255,0.65); line-height: 1.75; margin-bottom: 2rem; }
+.stats { display: flex; gap: 2rem; padding-top: 1.5rem; border-top: 0.5px solid var(--border); margin-bottom: 2rem; }
+.stat-n { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--gold); line-height: 1; }
+.stat-l { font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-top: 0.15rem; }
+
+/* ═══════════════════════════════════
+   EXPERIENCE HALLS
+═══════════════════════════════════ */
+.hall-card { background: var(--panel); border: 0.5px solid var(--border); padding: 2rem; position: relative; overflow: hidden; transition: all 0.3s ease; }
+.hall-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--gold); transform: scaleX(0); transition: transform 0.35s ease; transform-origin: left; }
+.hall-card:hover { background: #1A1820; }
+.hall-card:hover::after { transform: scaleX(1); }
+/* CSS3 Icon animation (Materi Pertemuan 4 & 6) */
+.hall-icon { font-size: 1.8rem; color: var(--gold); margin-bottom: 1rem; display: inline-block; transition: transform 0.4s ease; }
+.hall-card:hover .hall-icon { transform: rotateY(360deg); }
+.hall-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+.hall-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.2rem; }
+.hall-feat { font-size: 0.7rem; color: rgba(255,255,255,0.55); padding: 0.35rem 0; border-bottom: 0.5px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 0.5rem; }
+.hall-feat i { color: var(--gold); font-size: 0.6rem; width: 12px; }
+
+/* ═══════════════════════════════════
+   MEMBERSHIPS
+═══════════════════════════════════ */
+.member-card { border: 0.5px solid var(--border); padding: 2.5rem 2rem; text-align: center; background: var(--panel); position: relative; transition: transform 0.35s ease; }
+.member-card:hover { transform: translateY(-5px); }
+.member-card.featured { border-color: var(--gold); background: linear-gradient(145deg, #1a1612, var(--panel)); }
+.tier-popular { position: absolute; top: -1px; left: 50%; transform: translateX(-50%); background: var(--gold); color: var(--black); font-size: 0.58rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; padding: 0.28rem 0.9rem; white-space: nowrap; }
+.tier-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.75rem; letter-spacing: 0.12em; margin-bottom: 0.4rem; }
+.tier-price { font-family: 'Cormorant Garamond', serif; font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; }
+.tier-price strong { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; color: var(--gold); font-style: normal; }
+.tier-feat { font-size: 0.76rem; padding: 0.4rem 0; border-bottom: 0.5px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); }
+.tier-feat.yes { color: rgba(255,255,255,0.85); }
+.tier-feat.yes::before { content: '✦ '; color: var(--gold); font-size: 0.5rem; }
+
+/* ═══════════════════════════════════
+   FOOTER
+═══════════════════════════════════ */
+footer { background: var(--deep); border-top: 0.5px solid var(--border); padding: 4rem 0 2rem; }
+.footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.15em; color: var(--gold); margin-bottom: 0.5rem; }
+.footer-tagline { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--muted); margin-bottom: 1.5rem; }
+.footer-head { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.2rem; }
+.footer-link { display: block; font-size: 0.8rem; color: rgba(255,255,255,0.45); text-decoration: none; margin-bottom: 0.5rem; transition: color 0.2s; }
+.footer-link:hover { color: var(--gold-light); }
+.footer-bot { border-top: 0.5px solid rgba(255,255,255,0.06); padding-top: 1.5rem; margin-top: 3rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+.footer-copy { font-size: 0.7rem; color: var(--muted); }
+.social-btn { width: 32px; height: 32px; border: 0.5px solid var(--border); display: inline-flex; align-items: center; justify-content: center; color: var(--muted); text-decoration: none; transition: all 0.2s; font-size: 0.8rem; }
+.social-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ═══════════════════════════════════
+   CSS3 ANIMATIONS: Fade-up on scroll (Materi Pertemuan 6)
+═══════════════════════════════════ */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.65s ease, transform 0.65s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* CSS3 2D Transform: rotating SVG decoration */
+@keyframes spinSlow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+.svg-spin { animation: spinSlow 20s linear infinite; transform-origin: center; }
+.svg-float { animation: floatY 4s ease-in-out infinite; }
+
+/* Modal adjustments */
+.modal-content { background: var(--deep); border: 0.5px solid var(--border); border-radius: 0; color: #fff; }
+.modal-header { border-bottom: 0.5px solid var(--border); }
+.btn-close { filter: invert(1); }
+
+@media(max-width:768px){ .scroll-cue{display:none;} .hero{padding-bottom:3.5rem;} }
+</style>
+</head>
+<body>
+
+<!-- ═══ NAVBAR (Bootstrap) ═══ -->
+<nav id="navbar" class="py-0">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <a href="index.html" class="nav-logo">VELVET<span>SCREEN</span></a>
+      <div class="d-none d-lg-flex align-items-center gap-1">
+        <ul class="navbar-nav flex-row gap-1 mb-0">
+          <li class="nav-item"><a class="nav-link active px-3" href="index.html">Beranda</a></li>
+          <li class="nav-item"><a class="nav-link px-3" href="now-showing.html">Sedang Tayang</a></li>
+          <li class="nav-item"><a class="nav-link px-3" href="coming-soon.html">Segera Hadir</a></li>
+          <li class="nav-item"><a class="nav-link px-3" href="schedule.html">Jadwal</a></li>
+          <li class="nav-item"><a class="nav-link px-3" href="location.html">Lokasi</a></li>
+        </ul>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="booking.html" class="btn-ticket">Beli Tiket</a>
+        <button class="navbar-toggler d-lg-none" style="border:none;background:transparent;color:#fff;" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu"><i class="fa fa-bars"></i></button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Menu (Bootstrap Offcanvas) -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu" style="background:var(--deep);max-width:260px;">
+  <div class="offcanvas-header border-bottom" style="border-color:var(--border)!important;">
+    <span class="nav-logo">VELVET<span>SCREEN</span></span>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body pt-4">
+    <ul class="list-unstyled">
+      <li class="mb-3"><a href="index.html" class="footer-link" style="font-size:0.9rem;letter-spacing:.06em;"><i class="fa fa-home me-2" style="color:var(--gold)"></i> Beranda</a></li>
+      <li class="mb-3"><a href="now-showing.html" class="footer-link" style="font-size:0.9rem;"><i class="fa fa-film me-2" style="color:var(--gold)"></i> Sedang Tayang</a></li>
+      <li class="mb-3"><a href="coming-soon.html" class="footer-link" style="font-size:0.9rem;"><i class="fa fa-clock me-2" style="color:var(--gold)"></i> Segera Hadir</a></li>
+      <li class="mb-3"><a href="schedule.html" class="footer-link" style="font-size:0.9rem;"><i class="fa fa-calendar me-2" style="color:var(--gold)"></i> Jadwal</a></li>
+      <li class="mb-3"><a href="booking.html" class="footer-link" style="font-size:0.9rem;"><i class="fa fa-ticket me-2" style="color:var(--gold)"></i> Pesan Tiket</a></li>
+      <li class="mb-3"><a href="location.html" class="footer-link" style="font-size:0.9rem;"><i class="fa fa-map-marker-alt me-2" style="color:var(--gold)"></i> Lokasi</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero py-0">
+  <!-- SVG Decoration (Materi Pertemuan 2: HTML Grafis SVG) -->
+  <svg class="position-absolute top-0 end-0 d-none d-lg-block" width="280" height="280" viewBox="0 0 280 280" style="opacity:0.06;pointer-events:none;top:80px;">
+    <g class="svg-spin">
+      <circle cx="140" cy="140" r="120" fill="none" stroke="#C9A84C" stroke-width="1" stroke-dasharray="8 4"/>
+      <circle cx="140" cy="140" r="80" fill="none" stroke="#C9A84C" stroke-width="0.5"/>
+      <polygon points="140,20 260,200 20,200" fill="none" stroke="#C9A84C" stroke-width="0.5"/>
+    </g>
+  </svg>
+
+  <div class="container position-relative" style="z-index:2;">
+    <div class="col-lg-7 col-xl-6">
+      <div class="hero-badge">Film Pilihan Minggu Ini</div>
+      <h1 class="hero-title">ECHOES<br><span style="color:var(--gold)">OF</span><br>ETERNITY</h1>
+      <div class="hero-meta">
+        <span class="tag-rating">IMDb 8.7</span>
+        <span class="dot"></span><span>2 JAM 24 MENIT</span>
+        <span class="dot"></span><span>DRAMA · SCI-FI</span>
+        <span class="dot"></span><span>17+</span>
+      </div>
+      <div class="d-flex gap-3 flex-wrap">
+        <a href="booking.html" class="btn-gold"><i class="fa fa-ticket me-1"></i> Pesan Sekarang</a>
+        <a href="movies.html" class="btn-ghost"><i class="fa fa-play me-1"></i> Lihat Film</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-cue">
+    <div class="scroll-line"></div>
+    <span>Gulir</span>
+  </div>
+</section>
+
+<!-- ═══ CSS3 TICKER (Materi Pertemuan 6: CSS3 Animations) ═══ -->
+<div class="ticker-bar">
+  <div class="ticker-track">
+    <div class="ticker-item">ECHOES OF ETERNITY</div>
+    <div class="ticker-item">THE MIDNIGHT HOUR</div>
+    <div class="ticker-item">NEON PARADISE</div>
+    <div class="ticker-item">SHADOW PROTOCOL</div>
+    <div class="ticker-item">LAST LIGHT</div>
+    <div class="ticker-item">CRIMSON TIDE II</div>
+    <div class="ticker-item">VELVET DREAMS</div>
+    <!-- Duplicate for seamless loop -->
+    <div class="ticker-item">ECHOES OF ETERNITY</div>
+    <div class="ticker-item">THE MIDNIGHT HOUR</div>
+    <div class="ticker-item">NEON PARADISE</div>
+    <div class="ticker-item">SHADOW PROTOCOL</div>
+    <div class="ticker-item">LAST LIGHT</div>
+    <div class="ticker-item">CRIMSON TIDE II</div>
+    <div class="ticker-item">VELVET DREAMS</div>
+  </div>
+</div>
+
+<!-- ═══ SVG WAVE DIVIDER (Materi Pertemuan 2: HTML SVG) ═══ -->
+<div class="svg-divider" style="background:var(--black);margin-top:-1px;">
+  <svg viewBox="0 0 1440 40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="width:100%;height:40px;">
+    <path d="M0,20 C360,40 720,0 1080,20 C1260,30 1380,15 1440,20 L1440,40 L0,40 Z" fill="#111014"/>
+  </svg>
+</div>
+
+<!-- ═══ NOW SHOWING (Bootstrap Grid + CSS3 3D Hover) ═══ -->
+<section style="background:var(--black);padding-top:1rem;">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-5">
+      <div>
+        <p class="sec-eye">Jadwal Bioskop</p>
+        <h2 class="sec-title">SEDANG<br>TAYANG</h2>
+        <div class="divider-gold"></div>
+      </div>
+      <a href="now-showing.html" style="font-size:0.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);text-decoration:none;">Semua Film →</a>
+    </div>
+
+    <!-- Bootstrap Grid Row -->
+    <div class="row g-3" id="nowShowingGrid">
+      <!-- Loaded via AJAX in movies.html, shown statically here -->
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SVG DECORATIVE DIVIDER ═══ -->
+<div style="background:var(--black);overflow:hidden;line-height:0;">
+  <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;height:60px;">
+    <path d="M0,30 L180,10 L360,50 L540,20 L720,45 L900,15 L1080,40 L1260,10 L1440,30 L1440,60 L0,60 Z" fill="#111014" opacity="0.9"/>
+    <path d="M0,40 L240,20 L480,55 L720,25 L960,50 L1200,20 L1440,40 L1440,60 L0,60 Z" fill="#111014"/>
+  </svg>
+</div>
+
+<!-- ═══ FEATURED FILM ═══ -->
+<section class="featured-section py-0">
+  <div class="row g-0">
+    <div class="col-lg-5 d-none d-lg-block" style="max-height:520px;overflow:hidden;">
+      <img src="https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=800&q=80" class="featured-img" alt="Crimson Tide II">
+    </div>
+    <div class="col-lg-7 d-flex align-items-center" style="background:var(--panel);">
+      <div style="padding: 4rem 3.5rem;">
+        <span class="featured-badge">Pilihan Editor</span>
+        <h2 class="featured-title">CRIMSON<br>TIDE <span style="color:var(--gold);font-style:italic;font-family:'Cormorant Garamond',serif;font-size:0.5em;">II</span></h2>
+        <p class="featured-desc">Sekuel epik yang telah dinantikan. Kapten Ramsey kembali menghadapi ancaman lebih besar dari sebelumnya — kali ini dari dalam lautan biru yang gelap dan dingin.</p>
+        <div class="stats">
+          <div><div class="stat-n">9.1</div><div class="stat-l">Skor IMDb</div></div>
+          <div><div class="stat-n">147</div><div class="stat-l">Menit</div></div>
+          <div><div class="stat-n">4K</div><div class="stat-l">Resolusi IMAX</div></div>
+        </div>
+        <div class="d-flex gap-3 flex-wrap">
+          <a href="booking.html?id=5" class="btn-gold"><i class="fa fa-ticket me-1"></i> Pesan Sekarang</a>
+          <a href="movies.html" class="btn-ghost">Info Film</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ EXPERIENCE / HALLS — Font Awesome Icons (Pertemuan 4) + CSS3 Hover ═══ -->
+<section style="background:var(--black);">
+  <div class="container">
+    <div class="text-center mb-5 reveal">
+      <p class="sec-eye">Fasilitas Studio</p>
+      <h2 class="sec-title text-center">PILIH<br><span style="color:var(--gold)">PENGALAMANMU</span></h2>
+      <div class="divider-gold mx-auto"></div>
+    </div>
+    <!-- Bootstrap Grid -->
+    <div class="row g-3">
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="hall-card h-100">
+          <!-- Font Awesome Icon (Materi Pertemuan 4) -->
+          <i class="fa fa-expand hall-icon"></i>
+          <h3 class="hall-name">IMAX DOME</h3>
+          <p class="hall-desc">Layar lengkung 270° dengan suara surround 12.1 yang mengelilingi dari segala arah.</p>
+          <div class="hall-feat"><i class="fa fa-check"></i> Layar 270° Lengkung</div>
+          <div class="hall-feat"><i class="fa fa-check"></i> Dolby Atmos 12.1</div>
+          <div class="hall-feat"><i class="fa fa-check"></i> 4K Laser Projection</div>
+          <div class="mt-3" style="font-size:.7rem;color:var(--gold)">Ab Rp 120.000</div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="hall-card h-100">
+          <i class="fa fa-star hall-icon"></i>
+          <h3 class="hall-name">GOLD CLASS</h3>
+          <p class="hall-desc">Recliner mewah dengan layanan makanan premium dan privasi penuh untuk pengalaman eksklusif.</p>
+          <div class="hall-feat"><i class="fa fa-check"></i> Recliner Kulit</div>
+          <div class="hall-feat"><i class="fa fa-check"></i> Menu Fine Dining</div>
+          <div class="hall-feat"><i class="fa fa-check"></i> Hanya 80 Kursi</div>
+          <div class="mt-3" style="font-size:.7rem;color:var(--gold)">Ab Rp 200.000</div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="hall-card h-100">
+          <i class="fa fa-wind hall-icon"></i>
+          <h3 class="hall-name">4DX MOTION</h3>
+          <p class="hall-desc">Rasakan setiap adegan — kursi bergerak sinkron, efek angin, air, dan aroma nyata.</p>
+          <div class="hall-feat"><i class="fa fa-check"></i> Kursi Motion 6-Axis</div>
+          <div class="hall-feat"><i class="fa fa-check"></i> Efek Angin & Air</div>
+          <div class="hall-feat"><i class="fa fa-check"></i> Aroma Teknologi</div>
+          <div class="mt-3" style="font-size:.7rem;color:var(--gold)">Ab Rp 150.000</div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="hall-card h-100">
+          <i class="fa fa-film hall-icon"></i>
+          <h3 class="hall-name">STUDIO REG</h3>
+          <p class="hall-desc">Pengalaman bioskop klasik dengan kenyamanan modern, sempurna untuk semua kalangan.</p>
+          <div class="hall-feat"><i class="fa fa-check"></i> Layar 30m Lebar</div>
+          <div class="hall-feat"><i class="fa fa-check"></i> Dolby Digital 7.1</div>
+          <div class="hall-feat"><i class="fa fa-check"></i> 250 Kursi</div>
+          <div class="mt-3" style="font-size:.7rem;color:var(--gold)">Ab Rp 55.000</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MEMBERSHIP ═══ -->
+<section style="background:var(--deep);border-top:0.5px solid var(--border);border-bottom:0.5px solid var(--border);">
+  <div class="container">
+    <div class="text-center mb-5 reveal">
+      <p class="sec-eye">Program Loyalitas</p>
+      <h2 class="sec-title text-center">KEANGGOTAAN</h2>
+      <div class="divider-gold mx-auto"></div>
+    </div>
+    <!-- Bootstrap Grid -->
+    <div class="row g-3 justify-content-center">
+      <div class="col-md-4 col-lg-3 reveal">
+        <div class="member-card">
+          <div class="tier-name">SILVER</div>
+          <div class="tier-price"><strong>Gratis</strong></div>
+          <div class="border-top border-secondary pt-3 mt-2">
+            <div class="tier-feat yes">10% diskon tiket</div>
+            <div class="tier-feat yes">Poin reward</div>
+            <div class="tier-feat">Gold Class access</div>
+            <div class="tier-feat">Preview eksklusif</div>
+          </div>
+          <a href="#" class="btn-ghost d-block text-center mt-3" style="font-size:.7rem;padding:.6rem;">Daftar Gratis</a>
+        </div>
+      </div>
+      <div class="col-md-4 col-lg-3 reveal">
+        <div class="member-card featured">
+          <div class="tier-popular">Terpopuler</div>
+          <div class="tier-name">GOLD</div>
+          <div class="tier-price"><strong>99rb</strong>/bulan</div>
+          <div class="border-top pt-3 mt-2" style="border-color:var(--border)!important;">
+            <div class="tier-feat yes">20% diskon semua tiket</div>
+            <div class="tier-feat yes">2 tiket gratis/bulan</div>
+            <div class="tier-feat yes">Gold Class priority</div>
+            <div class="tier-feat yes">Preview khusus</div>
+          </div>
+          <a href="#" class="btn-gold d-block text-center mt-3" style="font-size:.7rem;padding:.6rem;">Mulai Gold</a>
+        </div>
+      </div>
+      <div class="col-md-4 col-lg-3 reveal">
+        <div class="member-card">
+          <div class="tier-name">PLATINUM</div>
+          <div class="tier-price"><strong>299rb</strong>/bulan</div>
+          <div class="border-top border-secondary pt-3 mt-2">
+            <div class="tier-feat yes">Tiket tak terbatas</div>
+            <div class="tier-feat yes">Semua studio</div>
+            <div class="tier-feat yes">Concierge 24/7</div>
+            <div class="tier-feat yes">Lounge VIP</div>
+          </div>
+          <a href="#" class="btn-ghost d-block text-center mt-3" style="font-size:.7rem;padding:.6rem;">Daftar Platinum</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-4">
+        <div class="footer-logo">VELVETSCREEN</div>
+        <div class="footer-tagline">Cinéma de Prestige</div>
+        <!-- SVG Logo mark (Materi Pertemuan 2) -->
+        <svg width="60" height="4" viewBox="0 0 60 4" style="margin-bottom:1rem;">
+          <line x1="0" y1="2" x2="50" y2="2" stroke="#C9A84C" stroke-width="0.5"/>
+          <circle cx="56" cy="2" r="2" fill="#C9A84C"/>
+        </svg>
+        <p style="font-size:.78rem;color:var(--muted);line-height:1.8;max-width:280px;">Pengalaman bioskop terdepan. Teknologi terkini, kenyamanan tak tertandingi.</p>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="footer-head">Film</div>
+        <a href="now-showing.html" class="footer-link">Sedang Tayang</a>
+        <a href="coming-soon.html" class="footer-link">Segera Hadir</a>
+        <a href="schedule.html" class="footer-link">Jadwal</a>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="footer-head">Studio</div>
+        <a href="#" class="footer-link">IMAX Dome</a>
+        <a href="#" class="footer-link">Gold Class</a>
+        <a href="#" class="footer-link">4DX Motion</a>
+        <a href="#" class="footer-link">Studio Reguler</a>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="footer-head">Info</div>
+        <a href="location.html" class="footer-link">Lokasi</a>
+        <a href="#" class="footer-link">Keanggotaan</a>
+        <a href="booking.html" class="footer-link">Pesan Tiket</a>
+        <a href="#" class="footer-link">Kontak</a>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <div class="footer-copy">© 2026 VelvetScreen. Hak cipta dilindungi.</div>
+      <div class="d-flex gap-2">
+        <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="social-btn"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="social-btn"><i class="fab fa-youtube"></i></a>
+        <a href="#" class="social-btn"><i class="fab fa-tiktok"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ═══ NAVBAR scroll effect ═══ */
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 60));
+
+/* ═══ AJAX fetch JSON (Materi Pertemuan 8: AJAX + 10: JSON HTTP) ═══ */
+async function loadNowShowing() {
+  try {
+    const res = await fetch('movies.json'); // AJAX fetch
+    const movies = await res.json();        // JSON parsing (Materi 10 & 11)
+    const nowShowing = movies.filter(m => m.status === 'now_showing').slice(0, 4);
+    const grid = document.getElementById('nowShowingGrid');
+    grid.innerHTML = nowShowing.map(m => `
+      <div class="col-6 col-md-4 col-lg-3 reveal">
+        <div class="movie-card">
+          <div class="movie-card-inner">
+            <img src="${m.poster}" alt="${m.title}" class="movie-poster" loading="lazy">
+            <div class="movie-base">
+              <div class="movie-genre">${m.genre}</div>
+              <div class="movie-name">${m.title}</div>
+            </div>
+            <div class="movie-hover">
+              <p class="movie-desc">${m.description}</p>
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="tag-rating">${m.rating}</span>
+                <span style="font-size:.65rem;color:var(--muted)">${m.duration} · ${m.age}</span>
+              </div>
+              <button class="btn-book" onclick="location.href='booking.html?id=${m.id}'">
+                <i class="fa fa-ticket me-1"></i> Pesan Tiket
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+    revealObserver(); // re-trigger observer for new elements
+  } catch(e) {
+    console.error('Gagal memuat data film:', e);
+    document.getElementById('nowShowingGrid').innerHTML = '<p class="text-muted small">Gagal memuat film.</p>';
+  }
+}
+
+/* ═══ Scroll reveal (CSS3 transition trigger) ═══ */
+function revealObserver() {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+}
+
+loadNowShowing();
+revealObserver();
+</script>
+</body>
+</html>
